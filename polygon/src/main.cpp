@@ -68,9 +68,9 @@ namespace feather
 
     DO_IT(POLYGON_SHAPE)
     { 
-        //PolygonShapeFields* shape = static_cast<PolygonShapeFields*>(fields);
-        //typedef field::Field<int,field::connection::In>* fielddata;
-        //fielddata f = static_cast<fielddata>(fields.at(0));
+        //typedef field::Field<FMesh,field::connection::In>* MeshIn;
+        //MeshIn meshIn = static_cast<MeshIn>(fields.at(2));
+        //meshIn->value.build_gl();
 
         //std::cout << "value from polycube field:" << f->value << std::endl;
         return status();
@@ -199,7 +199,7 @@ namespace feather
 
 } // namespace feather
 
-NODE_INIT(POLYGON_SHAPE,node::Polygon,"polyshape.svg")
+NODE_INIT(POLYGON_SHAPE,node::Shape,"polyshape.svg")
 
 
 /*
