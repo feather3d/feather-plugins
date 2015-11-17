@@ -308,10 +308,32 @@ namespace feather
         typedef field::Field<FMesh>* MeshOut;
         typedef field::Field<int>* SubIn;
 
-        MeshOut meshOut = static_cast<MeshOut>(fields.at(0));
-        SubIn subX = static_cast<SubIn>(fields.at(1));
-        SubIn subY = static_cast<SubIn>(fields.at(2));
-        SubIn subZ = static_cast<SubIn>(fields.at(3));
+        MeshOut meshOut=nullptr;
+        SubIn subX=0;
+        SubIn subY=0;
+        SubIn subZ=0;
+        for(auto f : fields){
+            if(f->id == 3)
+                subX = static_cast<SubIn>(f);
+            if(f->id == 4)
+                subY = static_cast<SubIn>(f);
+            if(f->id == 5)
+                subZ = static_cast<SubIn>(f);
+            if(f->id == 5)
+                meshOut = static_cast<MeshOut>(f);
+        }
+        if(!meshOut) {
+            std::cout << "could not find meshOut\n";
+            return status();
+        }
+        //typedef field::Field<FMesh>* MeshOut;
+        typedef field::Field<int>* SubIn;
+
+        //MeshOut meshOut = static_cast<MeshOut>(fields.at(0));
+
+        //SubIn subX = static_cast<SubIn>(fields.at(1));
+        //SubIn subY = static_cast<SubIn>(fields.at(2));
+        //SubIn subZ = static_cast<SubIn>(fields.at(3));
 
         int fcount = (subX->value+1)*2 + (subY->value+1)*2 + (subZ->value+1)*2;
         int vcount = fcount + 2;
