@@ -68,7 +68,7 @@ namespace feather
 
     DO_IT(POLYGON_SHAPE)
     { 
-        //typedef field::Field<FMesh,field::connection::In>* MeshIn;
+        //typedef field::Field<FMesh>* MeshIn;
         //MeshIn meshIn = static_cast<MeshIn>(fields.at(2));
         //meshIn->value.build_gl();
 
@@ -86,9 +86,14 @@ namespace feather
 
     GL_DRAW(POLYGON_SHAPE)
     {
-        // meshIn
-        typedef field::Field<FMesh,field::connection::In>* fielddata;
-        fielddata tf = static_cast<fielddata>(feather::scenegraph::get_fieldBase(node.uid,320,3));
+        std::cout << "Polygon Shape - DO_IT()\n";
+         // meshIn
+        field::FieldBase* f = feather::scenegraph::get_fieldBase(node.uid,320,3);
+
+        typedef field::Field<FMesh>* fielddata;
+        fielddata tf = static_cast<fielddata>(f);
+
+        //fielddata tf = static_cast<fielddata>(feather::scenegraph::get_fieldBase(node.uid,320,3));
 
         // you can check connection using tf->connected
  
@@ -100,7 +105,15 @@ namespace feather
         //info.program->setUniformValue(glLightDirection,QVertex3D(1.0,0.0,0.0));
 
         if(tf!=NULL)
-        { 
+        {
+            std::cout << "DRAWING V COUNT " << tf->value.v.size() << std::endl;
+            std::cout << "field specs" 
+                << "\n\tconnected:" << tf->connected 
+                << "\n\tfid:" << tf->id
+                << "\n\tpn:" << tf->pn
+                << "\n\tpf:" << tf->pf
+                << "\n\ttype:" << tf->type
+                << std::endl;
 
             if(tf->value.v.size() >= 4)
             {
@@ -135,7 +148,6 @@ namespace feather
                 info.program->setAttributeArray(node.glColor, GL_FLOAT, &tf->value.glc[0], 4);
                 info.program->setAttributeArray(node.glNormal, GL_DOUBLE, &tf->value.vn[0],3);
 
-                /*
                 std::cout << "draw count for " << node.uid
                     << "\n\tv=" << tf->value.v.size()
                     << "\n\tglc=" << tf->value.glc.size()
@@ -143,7 +155,6 @@ namespace feather
                     << "\n\tgli=" << tf->value.gli.size()
                     << "\n\tf=" << tf->value.f.size()
                     << std::endl;
-                */
 
                 /*
                 QColor color;
@@ -211,9 +222,12 @@ NODE_INIT(POLYGON_SHAPE,node::Shape,"polyshape.svg")
 ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::In,FNode(),1)
 // child
 ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::Out,FNode(),2)
+// subX
 ADD_FIELD_TO_NODE(POLYGON_PLANE,int,field::Int,field::connection::In,2,3)
+// subY
 ADD_FIELD_TO_NODE(POLYGON_PLANE,int,field::Int,field::connection::In,2,4)
-
+// meshOut
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
 
 
 namespace feather
@@ -221,12 +235,55 @@ namespace feather
 
     DO_IT(POLYGON_PLANE)
     { 
+        //field::FieldBase* f = feather::scenegraph::get_fieldBase(node.uid,320,3);
+
+        std::cout << "Polygon Plane - DO_IT()\n";
+        typedef field::Field<FMesh>* MeshOut;
+
+        MeshOut meshOut=nullptr;
+        for(auto f : fields){
+            if(f->id == 5)
+                meshOut = static_cast<MeshOut>(f);
+        }
+        if(!meshOut) {
+            std::cout << "could not find meshOut\n";
+            return status();
+        }
+        //MeshOut meshOut = static_cast<MeshOut>(fields.at(4));
+
+        meshOut->value.v.clear();
+        meshOut->value.vn.clear();
+        meshOut->value.glv.clear();
+        meshOut->value.glvn.clear();
+        meshOut->value.gli.clear();
+
+        meshOut->value.v.push_back(FVertex3D(1.0,1.0,1.0));
+        meshOut->value.v.push_back(FVertex3D(1.0,-1.0,1.0));
+        meshOut->value.v.push_back(FVertex3D(-1.0,-1.0,1.0));
+        meshOut->value.v.push_back(FVertex3D(-1.0,1.0,1.0));
+ 
+        meshOut->value.vn.push_back(FVertex3D(0.33,0.33,0.33));
+        meshOut->value.vn.push_back(FVertex3D(0.33,-0.33,0.33));
+        meshOut->value.vn.push_back(FVertex3D(-0.33,-0.33,0.33));
+        meshOut->value.vn.push_back(FVertex3D(-0.33,0.33,0.33));
+ 
+        FFace f;           
+        // front face 
+        f.push_back(FFacePoint(0,0,0));
+        f.push_back(FFacePoint(1,0,1));
+        f.push_back(FFacePoint(2,0,2));
+        f.push_back(FFacePoint(3,0,3));
+        meshOut->value.add_face(f);
+        f.clear();
+
+        meshOut->value.build_gl();
+
         return status();
     };
 
 } // namespace feather
 
-NODE_INIT(POLYGON_PLANE,node::Polygon,"")
+NODE_INIT(POLYGON_PLANE,node::Polygon,"polyplane.svg")
 
 
 /*
@@ -248,8 +305,8 @@ namespace feather
 
     DO_IT(POLYGON_CUBE) 
     {
-        typedef field::Field<FMesh,field::connection::Out>* MeshOut;
-        typedef field::Field<int,field::connection::In>* SubIn;
+        typedef field::Field<FMesh>* MeshOut;
+        typedef field::Field<int>* SubIn;
 
         MeshOut meshOut = static_cast<MeshOut>(fields.at(0));
         SubIn subX = static_cast<SubIn>(fields.at(1));

@@ -95,7 +95,7 @@ namespace feather
                     feather::scenegraph::update();
 
                     // get the mesh from the node and fill in it's values
-                    typedef field::Field<feather::FMesh,field::connection::In>* sourcefield;
+                    typedef field::Field<feather::FMesh>* sourcefield;
                     sourcefield sf=NULL;
 
                     // NOTE: you can't call feather::sg[uid] from here - you will get a seg fault 
