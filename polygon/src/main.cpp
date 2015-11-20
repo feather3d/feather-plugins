@@ -86,7 +86,7 @@ namespace feather
 
     GL_DRAW(POLYGON_SHAPE)
     {
-        std::cout << "Polygon Shape - DO_IT()\n";
+        //std::cout << "Polygon Shape - DO_IT()\n";
          // meshIn
         field::FieldBase* f = feather::scenegraph::get_fieldBase(node.uid,320,3);
 
@@ -106,7 +106,8 @@ namespace feather
 
         if(tf!=NULL)
         {
-            std::cout << "DRAWING V COUNT " << tf->value.v.size() << std::endl;
+            //std::cout << "DRAWING V COUNT " << tf->value.v.size() << std::endl;
+            /*
             std::cout << "field specs" 
                 << "\n\tconnected:" << tf->connected 
                 << "\n\tfid:" << tf->id
@@ -114,6 +115,7 @@ namespace feather
                 << "\n\tpf:" << tf->pf
                 << "\n\ttype:" << tf->type
                 << std::endl;
+            */
 
             if(tf->value.v.size() >= 4)
             {
@@ -148,6 +150,7 @@ namespace feather
                 info.program->setAttributeArray(node.glColor, GL_FLOAT, &tf->value.glc[0], 4);
                 info.program->setAttributeArray(node.glNormal, GL_DOUBLE, &tf->value.vn[0],3);
 
+                /*
                 std::cout << "draw count for " << node.uid
                     << "\n\tv=" << tf->value.v.size()
                     << "\n\tglc=" << tf->value.glc.size()
@@ -155,8 +158,9 @@ namespace feather
                     << "\n\tgli=" << tf->value.gli.size()
                     << "\n\tf=" << tf->value.f.size()
                     << std::endl;
+                */
 
-                /*
+                /*      
                 QColor color;
 
                 color.setRgb(0,0,100);
@@ -237,7 +241,7 @@ namespace feather
     { 
         //field::FieldBase* f = feather::scenegraph::get_fieldBase(node.uid,320,3);
 
-        std::cout << "Polygon Plane - DO_IT()\n";
+        //std::cout << "Polygon Plane - DO_IT()\n";
         typedef field::Field<FMesh>* MeshOut;
 
         MeshOut meshOut=nullptr;
@@ -246,7 +250,7 @@ namespace feather
                 meshOut = static_cast<MeshOut>(f);
         }
         if(!meshOut) {
-            std::cout << "could not find meshOut\n";
+            //std::cout << "could not find meshOut\n";
             return status();
         }
         //MeshOut meshOut = static_cast<MeshOut>(fields.at(4));
@@ -323,7 +327,7 @@ namespace feather
                 meshOut = static_cast<MeshOut>(f);
         }
         if(!meshOut) {
-            std::cout << "could not find meshOut\n";
+            //std::cout << "could not find meshOut\n";
             return status();
         }
         //typedef field::Field<FMesh>* MeshOut;
