@@ -72,6 +72,48 @@ PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,T
 ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::In,FNode(),1)
 // child
 ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::Out,FNode(),2)
+// tX 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,3)
+// tY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,4)
+// tZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,5)
+// rX 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,6)
+// rY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,7)
+// rZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,8)
+// sX 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,9)
+// sY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,10)
+// sZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,11)
+// tX 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,12)
+// tY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,13)
+// tZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,14)
+// rX
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,15)
+// rY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,16)
+// rZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,17)
+// sX 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,18)
+// sY 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,19)
+// sZ 
+ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,20)
+
+
+
+
+
+
 
 
 namespace feather

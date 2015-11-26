@@ -61,7 +61,7 @@ ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::Out,FNode()
 // meshIn
 ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),3)
 // testIn
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,int,field::Int,field::connection::In,10,4)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FInt,field::Int,field::connection::In,10,4)
 
 namespace feather
 {
@@ -227,9 +227,9 @@ ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::In,FNode(),
 // child
 ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::Out,FNode(),2)
 // subX
-ADD_FIELD_TO_NODE(POLYGON_PLANE,int,field::Int,field::connection::In,2,3)
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,3)
 // subY
-ADD_FIELD_TO_NODE(POLYGON_PLANE,int,field::Int,field::connection::In,2,4)
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,4)
 // meshOut
 ADD_FIELD_TO_NODE(POLYGON_PLANE,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
 
@@ -299,9 +299,9 @@ NODE_INIT(POLYGON_PLANE,node::Polygon,"polyplane.svg")
 ADD_FIELD_TO_NODE(POLYGON_CUBE,FNode,field::Node,field::connection::In,FNode(),1)
 // child
 ADD_FIELD_TO_NODE(POLYGON_CUBE,FNode,field::Node,field::connection::Out,FNode(),2)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,int,field::Int,field::connection::In,0,3)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,int,field::Int,field::connection::In,0,4)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,int,field::Int,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,4)
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,5)
 ADD_FIELD_TO_NODE(POLYGON_CUBE,FMesh,field::Mesh,field::connection::Out,FMesh(),6)
 
 namespace feather
