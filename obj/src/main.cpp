@@ -85,7 +85,7 @@ namespace feather
 
             for_each(data.object.begin(), data.object.end(), [&uid,&vstep] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    uid = feather::scenegraph::add_node(feather::node::Polygon,320,objdata.o);            
+                    uid = feather::scenegraph::add_node(320,objdata.o);            
                     std::cout << "mesh uid:" << uid << std::endl;
                     // for now I'm just going to connect the root to the node 
                     feather::status p = feather::scenegraph::connect(0,2,uid,1);
