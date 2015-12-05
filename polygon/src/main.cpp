@@ -340,7 +340,7 @@ namespace feather
         //SubIn subZ = static_cast<SubIn>(fields.at(3));
 
         int fcount = (subX->value+1)*2 + (subY->value+1)*2 + (subZ->value+1)*2;
-        int vcount = fcount + 2;
+        //int vcount = fcount + 2;
 
         if(subX->update || subY->update || subZ->update)
         {

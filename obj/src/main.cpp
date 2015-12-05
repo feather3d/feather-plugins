@@ -57,6 +57,7 @@ namespace feather
         enum Command { N=0, IMPORT_OBJ, EXPORT_OBJ };
 
         status import_obj(parameter::ParameterList params) {
+            feather::status s;
             std::string filename;
             bool selection=false;
             bool p=false;
@@ -75,7 +76,7 @@ namespace feather
 
             //return status();
             obj_data_t data;
-            feather::status s = obj::io::file<obj::io::IMPORT,obj::io::OBJ>(data,filename);
+            s = obj::io::file<obj::io::IMPORT,obj::io::OBJ>(data,filename);
 
 
             // for each object in the data file, create a node
@@ -83,9 +84,9 @@ namespace feather
             int uid = 0;
             int vstep = 0;
 
-            for_each(data.object.begin(), data.object.end(), [&uid,&vstep] (object_t& objdata) {
+            for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    uid = feather::scenegraph::add_node(320,objdata.o);            
+                    uid = feather::scenegraph::add_node(320,objdata.o,s);            
                     std::cout << "mesh uid:" << uid << std::endl;
                     // for now I'm just going to connect the root to the node 
                     feather::status p = feather::scenegraph::connect(0,2,uid,1);
