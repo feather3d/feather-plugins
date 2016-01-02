@@ -27,7 +27,7 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
-
+#include <feather/draw.hpp>
 
 /*
  ***************************************
@@ -80,6 +80,16 @@ namespace feather
     { 
         return status();
     };
+
+    DRAW_IT(EMPTY)
+    {
+        std::cout << "EMPTY DRAW IT\n";
+        ADD_LINE(FVertex3D(0.0,0.0,0.0),FVertex3D(2.0,2.0,2.0),FColorRGB(1.0,1.0,0.0),draw::Line::Solid)
+        return status();
+    };
+
+    //DRAW_INIT(EMPTY)
+
 } // namespace feather
 
 NODE_INIT(EMPTY,node::Empty,"node_empty.svg")

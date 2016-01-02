@@ -28,6 +28,7 @@
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
 #include <feather/scenegraph.hpp>
+#include <feather/draw.hpp>
 #include <feather/gl.hpp>
 #include <QColor>
 
@@ -74,6 +75,11 @@ namespace feather
 
         //std::cout << "value from polycube field:" << f->value << std::endl;
         return status();
+    };
+
+    DRAW_IT(POLYGON_SHAPE)
+    {
+        return status();    
     };
 
     GL_INIT(POLYGON_SHAPE)
