@@ -79,6 +79,8 @@ namespace feather
 
     DRAW_IT(POLYGON_SHAPE)
     {
+        std::cout << "POLYGON_SHAPE DRAW IT\n";
+        ADD_MESH(3)
         return status();    
     };
 
