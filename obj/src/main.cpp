@@ -124,9 +124,6 @@ namespace feather
                     else
                         std::cout << "NULL SOURCE FIELD\n";
 
-                    // build the gl mesh for the viewport
-                    sf->value.build_gl();
-
                     //std::cout << "added " << uid << " to the uid_update state which is " << feather::cstate.uid_update.size() << std::endl;
                     
                     //feather::scenegraph::update();
