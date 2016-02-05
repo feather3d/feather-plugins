@@ -57,8 +57,9 @@ using namespace feather;
 // Define all of our nodes
 // with id's here.
 #define EMPTY 1
-#define SHAPE 2
-#define TRANSFORM 3
+#define CAMERA 2
+#define SHAPE 3
+#define TRANSFORM 4
 
 PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TRANSFORM)
 
@@ -93,6 +94,42 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(EMPTY,node::Empty,"node_empty.svg")
+
+
+/*
+ ***************************************
+ *               CAMERA                *
+ ***************************************
+*/
+
+// parent
+ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::Out,FNode(),2)
+// type 
+ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,3)
+// fov 
+ADD_FIELD_TO_NODE(CAMERA,FDouble,field::Double,field::connection::In,45.0,4)
+
+namespace feather
+{
+    DO_IT(CAMERA)
+    { 
+        return status();
+    };
+
+    DRAW_IT(CAMERA)
+    {
+        std::cout << "CAMERA DRAW IT\n";
+        ADD_PERSP_CAMERA(4)
+        return status();
+    };
+
+    //DRAW_INIT(EMPTY)
+
+} // namespace feather
+
+NODE_INIT(CAMERA,node::Camera,"node_camera.svg")
 
 
 /*

@@ -60,6 +60,7 @@ namespace feather
         status import_obj(parameter::ParameterList params) {
             feather::status s;
             std::string filename;
+            std::vector<unsigned int> uids;
             bool selection=false;
             bool p=false;
             p = params.getParameterValue<std::string>("filename",filename);
@@ -68,7 +69,7 @@ namespace feather
             p = params.getParameterValue<bool>("selection",selection);
             if(!p)
                 return status(FAILED,"selection parameter failed");
-
+            
             // load the mesh
             //mesh_t mesh;
             //p = obj::io::load_mesh(mesh,filename);
@@ -87,7 +88,7 @@ namespace feather
 
             for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    uid = feather::scenegraph::add_node(320,objdata.o,s);            
+                    uid = feather::scenegraph::add_node(320,objdata.o,s);
                     std::cout << "mesh uid:" << uid << std::endl;
                     // for now I'm just going to connect the root to the node 
                     feather::status p = feather::scenegraph::connect(0,2,uid,1);
