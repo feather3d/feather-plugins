@@ -27,7 +27,7 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
-
+#include <feather/draw.hpp>
 
 /*
  ***************************************
@@ -57,8 +57,9 @@ using namespace feather;
 // Define all of our nodes
 // with id's here.
 #define EMPTY 1
-#define SHAPE 2
-#define TRANSFORM 3
+#define CAMERA 2
+#define SHAPE 3
+#define TRANSFORM 4
 
 PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TRANSFORM)
 
@@ -72,48 +73,6 @@ PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,T
 ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::In,FNode(),1)
 // child
 ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::Out,FNode(),2)
-// tX 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,3)
-// tY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,4)
-// tZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,5)
-// rX 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,6)
-// rY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,7)
-// rZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,0,8)
-// sX 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,9)
-// sY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,10)
-// sZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::In,1,11)
-// tX 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,12)
-// tY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,13)
-// tZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,14)
-// rX
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,15)
-// rY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,16)
-// rZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,0,17)
-// sX 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,18)
-// sY 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,19)
-// sZ 
-ADD_FIELD_TO_NODE(EMPTY,FDouble,field::Double,field::connection::Out,1,20)
-
-
-
-
-
-
 
 
 namespace feather
@@ -122,9 +81,55 @@ namespace feather
     { 
         return status();
     };
+
+    DRAW_IT(EMPTY)
+    {
+        std::cout << "EMPTY DRAW IT\n";
+        ADD_LINE(FVertex3D(0.0,0.0,0.0),FVertex3D(2.0,2.0,2.0),FColorRGB(1.0,1.0,0.0),draw::Line::Solid)
+        return status();
+    };
+
+    //DRAW_INIT(EMPTY)
+
 } // namespace feather
 
 NODE_INIT(EMPTY,node::Empty,"node_empty.svg")
+
+
+/*
+ ***************************************
+ *               CAMERA                *
+ ***************************************
+*/
+
+// parent
+ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::Out,FNode(),2)
+// type 
+ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,3)
+// fov 
+ADD_FIELD_TO_NODE(CAMERA,FDouble,field::Double,field::connection::In,45.0,4)
+
+namespace feather
+{
+    DO_IT(CAMERA)
+    { 
+        return status();
+    };
+
+    DRAW_IT(CAMERA)
+    {
+        std::cout << "CAMERA DRAW IT\n";
+        ADD_PERSP_CAMERA(4)
+        return status();
+    };
+
+    //DRAW_INIT(EMPTY)
+
+} // namespace feather
+
+NODE_INIT(CAMERA,node::Camera,"node_camera.svg")
 
 
 /*
@@ -157,15 +162,68 @@ NODE_INIT(SHAPE,node::Object,"")
  ***************************************
 */
 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,1)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,2)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,3)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,4)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,5)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,6)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,7)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,8)
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0.0,9)
+// parent
+ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::Out,FNode(),2)
+// LOCAL POSITION IN
+// tX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,3)
+// tY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,4)
+// tZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,5)
+// rX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,6)
+// rY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,7)
+// rZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,8)
+// sX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,9)
+// sY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,10)
+// sZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,11)
+// LOCAL POSITION OUT
+// tX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,12)
+// tY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,13)
+// tZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,14)
+// rX
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,15)
+// rY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,16)
+// rZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,17)
+// sX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,18)
+// sY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,19)
+// sZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,20)
+// WORLD POSITION OUT 
+// tX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,21)
+// tY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,22)
+// tZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,23)
+// rX
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,24)
+// rY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,25)
+// rZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,26)
+// sX 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,27)
+// sY 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,28)
+// sZ 
+ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,29)
+
 
 namespace feather
 {
@@ -173,11 +231,14 @@ namespace feather
     {
         //TransformFields* xform = static_cast<TransformFields*>(fields);
         //std::cout << "xform: tx:" << xform->tx << std::endl;
+        
+        // Take the input and generate world coords using the parent node position
+
         return status();
     };
 } // namespace feather
 
-NODE_INIT(TRANSFORM,node::Manipulator,"")
+NODE_INIT(TRANSFORM,node::Manipulator,"transform.svg")
 
 
 /*

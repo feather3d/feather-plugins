@@ -24,6 +24,7 @@
 #include <feather/deps.hpp>
 #include <feather/pluginmanager.hpp>
 #include <feather/field.hpp>
+#include <feather/draw.hpp>
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
@@ -57,7 +58,9 @@ namespace feather
         enum Command { N=0, IMPORT_OBJ, EXPORT_OBJ };
 
         status import_obj(parameter::ParameterList params) {
+            feather::status s;
             std::string filename;
+            std::vector<unsigned int> uids;
             bool selection=false;
             bool p=false;
             p = params.getParameterValue<std::string>("filename",filename);
@@ -66,7 +69,7 @@ namespace feather
             p = params.getParameterValue<bool>("selection",selection);
             if(!p)
                 return status(FAILED,"selection parameter failed");
-
+            
             // load the mesh
             //mesh_t mesh;
             //p = obj::io::load_mesh(mesh,filename);
@@ -75,7 +78,7 @@ namespace feather
 
             //return status();
             obj_data_t data;
-            feather::status s = obj::io::file<obj::io::IMPORT,obj::io::OBJ>(data,filename);
+            s = obj::io::file<obj::io::IMPORT,obj::io::OBJ>(data,filename);
 
 
             // for each object in the data file, create a node
@@ -83,9 +86,9 @@ namespace feather
             int uid = 0;
             int vstep = 0;
 
-            for_each(data.object.begin(), data.object.end(), [&uid,&vstep] (object_t& objdata) {
+            for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    uid = feather::scenegraph::add_node(320,objdata.o);            
+                    uid = feather::scenegraph::add_node(320,objdata.o,s);
                     std::cout << "mesh uid:" << uid << std::endl;
                     // for now I'm just going to connect the root to the node 
                     feather::status p = feather::scenegraph::connect(0,2,uid,1);
@@ -121,9 +124,6 @@ namespace feather
                     }
                     else
                         std::cout << "NULL SOURCE FIELD\n";
-
-                    // build the gl mesh for the viewport
-                    sf->value.build_gl();
 
                     //std::cout << "added " << uid << " to the uid_update state which is " << feather::cstate.uid_update.size() << std::endl;
                     
