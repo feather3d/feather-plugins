@@ -188,7 +188,7 @@ namespace feather
                 subY = static_cast<SubIn>(f);
             if(f->id == 5)
                 subZ = static_cast<SubIn>(f);
-            if(f->id == 5)
+            if(f->id == 6)
                 meshOut = static_cast<MeshOut>(f);
         }
         if(!meshOut) {
