@@ -60,8 +60,9 @@ using namespace feather;
 #define CAMERA 2
 #define SHAPE 3
 #define TRANSFORM 4
+#define TIME 5
 
-PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TRANSFORM)
+PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TIME)
 
 /*
  ***************************************
@@ -239,6 +240,43 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(TRANSFORM,node::Manipulator,"transform.svg")
+
+
+/*
+ ***************************************
+ *               TIME                  *
+ ***************************************
+*/
+
+// parent
+ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::Out,FNode(),2)
+ADD_FIELD_TO_NODE(TIME,FTime,field::Time,field::connection::Out,FTime(),3)
+
+
+
+namespace feather
+{
+    DO_IT(TIME)
+    { 
+        return status();
+    };
+
+    /*
+    DRAW_IT(TIME)
+    {
+        std::cout << "TIME DRAW IT\n";
+        ADD_LINE(FVertex3D(0.0,0.0,0.0),FVertex3D(2.0,2.0,2.0),FColorRGB(1.0,1.0,0.0),draw::Line::Solid)
+        return status();
+    };
+    */
+
+    //DRAW_INIT(TIME)
+
+} // namespace feather
+
+NODE_INIT(TIME,node::Time,"time.svg")
 
 
 /*
