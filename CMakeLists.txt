@@ -27,7 +27,9 @@ SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #SET(CMAKE_CXX_LINK_FLAGS "-ldl")
 
-ADD_SUBDIRECTORY(base)
+# base is just an example, DON'T BUILD IT!
+# base uses enums that are used by other plugins and will cause issues
+#ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(polygon)
 ADD_SUBDIRECTORY(obj)
