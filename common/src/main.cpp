@@ -170,12 +170,86 @@ NODE_INIT(SHAPE,node::Object,"")
 ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::In,FNode(),1)
 // child
 ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::Out,FNode(),2)
-ADD_FIELD_TO_NODE(TIME,FTime,field::Time,field::connection::Out,FTime(),3)
+// IN FIELDS
+// start time
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,0,3)
+// end time
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,10,4)
+// current time 
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,0,5)
+// fps
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,24,6)
+// OUT FIELDS
+// start time
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,7)
+// end time
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,8)
+// current time 
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,9)
+// fps
+ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,10)
 
 namespace feather
 {
     DO_IT(TIME)
-    { 
+    {
+        typedef field::Field<FDouble>*  DField;
+
+        DField stimeIn=0;
+        DField etimeIn=0;
+        DField cposIn=0;
+        DField fpsIn=0;
+        DField stimeOut=0;
+        DField etimeOut=0;
+        DField cposOut=0;
+        DField fpsOut=0;
+
+        for(auto f : fields){
+            if(f->id == 3)
+                stimeIn = static_cast<DField>(f);
+            if(f->id == 4)
+                etimeIn = static_cast<DField>(f);
+            if(f->id == 5)
+                cposIn = static_cast<DField>(f);
+            if(f->id == 6)
+                fpsIn = static_cast<DField>(f);
+            if(f->id == 7)
+                stimeOut = static_cast<DField>(f);
+            if(f->id == 8)
+                etimeOut = static_cast<DField>(f);
+            if(f->id == 9)
+                cposOut = static_cast<DField>(f);
+            if(f->id == 10)
+                fpsOut = static_cast<DField>(f);
+        }
+
+        // set the values that changed
+
+        // stime
+        if(stimeIn->update) {
+            stimeOut->value = stimeIn->value;
+            stimeIn->update = false;
+        }
+
+        // etime
+        if(etimeIn->update) {
+            etimeOut->value = etimeIn->value;
+            etimeIn->update = false;
+        }
+
+        // cpos 
+        if(cposIn->update) {
+            cposOut->value = cposIn->value;
+            cposIn->update = false;
+            std::cout << "set cposOut to:" << cposOut->value << std::endl;
+        }
+
+        // fps 
+        if(fpsIn->update) {
+            fpsOut->value = fpsIn->value;
+            fpsIn->update = false;
+        }
+        
         return status();
     };
 
