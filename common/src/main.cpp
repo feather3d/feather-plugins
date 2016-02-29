@@ -110,7 +110,7 @@ ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::Out,FNode(),2)
 // type 
 ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,3)
 // fov 
-ADD_FIELD_TO_NODE(CAMERA,FDouble,field::Double,field::connection::In,45.0,4)
+ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,45.0,4)
 
 namespace feather
 {
@@ -172,28 +172,28 @@ ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::In,FNode(),1)
 ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::Out,FNode(),2)
 // IN FIELDS
 // start time
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,3)
 // end time
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,10,4)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,10,4)
 // current time 
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,5)
 // fps
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::In,24,6)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,24,6)
 // OUT FIELDS
 // start time
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,7)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,7)
 // end time
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,8)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,8)
 // current time 
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,9)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,9)
 // fps
-ADD_FIELD_TO_NODE(TIME,FDouble,field::Double,field::connection::Out,0,10)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,10)
 
 namespace feather
 {
     DO_IT(TIME)
     {
-        typedef field::Field<FDouble>*  DField;
+        typedef field::Field<FReal>*  DField;
 
         DField stimeIn=0;
         DField etimeIn=0;
@@ -281,61 +281,61 @@ ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::In,FNode(),1)
 ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::Out,FNode(),2)
 // LOCAL POSITION IN
 // tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,3)
 // tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,4)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,4)
 // tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,5)
 // rX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,6)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,6)
 // rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,7)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,7)
 // rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,0,8)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,8)
 // sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,9)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,9)
 // sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,10)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,10)
 // sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::In,1,11)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,11)
 // LOCAL POSITION OUT
 // tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,12)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,12)
 // tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,13)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,13)
 // tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,14)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,14)
 // rX
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,15)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,15)
 // rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,16)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,16)
 // rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,17)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,17)
 // sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,18)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,18)
 // sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,19)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,19)
 // sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,20)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,20)
 // WORLD POSITION OUT 
 // tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,21)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,21)
 // tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,22)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,22)
 // tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,23)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,23)
 // rX
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,24)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,24)
 // rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,25)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,25)
 // rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,0,26)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,26)
 // sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,27)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,27)
 // sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,28)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,28)
 // sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FDouble,field::Double,field::connection::Out,1,29)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,29)
 
 
 namespace feather
