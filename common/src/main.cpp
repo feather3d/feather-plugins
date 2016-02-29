@@ -60,7 +60,9 @@ using namespace feather;
 #define CAMERA 2
 #define SHAPE 3
 #define TIME 4
-#define TRANSFORM 5
+#define MULTIPLY 5
+#define DIVIDE 6
+#define TRANSFORM 7
 
 PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TRANSFORM)
 
@@ -267,6 +269,121 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(TIME,node::Time,"time.svg")
+
+
+/*
+ ***************************************
+ *               MULTIPLY              *
+ ***************************************
+*/
+
+// parent
+ADD_FIELD_TO_NODE(MULTIPLY,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(MULTIPLY,FNode,field::Node,field::connection::Out,FNode(),2)
+// IN FIELDS
+// value 
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,0,3)
+// OUT FIELDS
+// value 
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::Out,0,4)
+
+namespace feather
+{
+    DO_IT(MULTIPLY)
+    {
+        typedef field::Field<FReal>*  DField;
+
+        DField valueIn=0;
+        DField valueOut=0;
+
+        for(auto f : fields){
+            if(f->id == 3)
+                valueIn = static_cast<DField>(f);
+            if(f->id == 4)
+                valueOut = static_cast<DField>(f);
+        }
+
+        // set the values that changed
+
+        // value
+        if(valueIn->update) {
+            valueOut->value = valueIn->value;
+            valueIn->update = false;
+        }
+
+        return status();
+    };
+
+    /*
+    DRAW_IT(MULTIPLY)
+    {
+    };
+    */
+
+    //DRAW_INIT(MULTIPLY)
+
+} // namespace feather
+
+NODE_INIT(MULTIPLY,node::Tool,"multiply.svg")
+
+
+/*
+ ***************************************
+ *               DIVIDE                *
+ ***************************************
+*/
+
+// parent
+ADD_FIELD_TO_NODE(DIVIDE,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(DIVIDE,FNode,field::Node,field::connection::Out,FNode(),2)
+// IN FIELDS
+// value 
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,0,3)
+// OUT FIELDS
+// value 
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::Out,0,4)
+
+namespace feather
+{
+    DO_IT(DIVIDE)
+    {
+        typedef field::Field<FReal>*  DField;
+
+        DField valueIn=0;
+        DField valueOut=0;
+
+        for(auto f : fields){
+            if(f->id == 3)
+                valueIn = static_cast<DField>(f);
+            if(f->id == 4)
+                valueOut = static_cast<DField>(f);
+        }
+
+        // set the values that changed
+
+        // value
+        if(valueIn->update) {
+            valueOut->value = valueIn->value;
+            valueIn->update = false;
+        }
+
+        return status();
+    };
+
+    /*
+    DRAW_IT(DIVIDE)
+    {
+    };
+    */
+
+    //DRAW_INIT(DIVIDE)
+
+} // namespace feather
+
+NODE_INIT(DIVIDE,node::Tool,"divide.svg")
+
 
 
 /*
