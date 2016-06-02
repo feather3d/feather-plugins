@@ -61,17 +61,58 @@ ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::Out,FNode()
 // meshIn
 ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),3)
 // testIn
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FInt,field::Int,field::connection::In,10,4)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FReal,field::Real,field::connection::In,1,4)
 
 namespace feather
 {
 
     DO_IT(POLYGON_SHAPE)
     { 
-        //typedef field::Field<FMesh>* MeshIn;
-        //MeshIn meshIn = static_cast<MeshIn>(fields.at(2));
+        typedef field::Field<FMesh>*  MeshField;
+        typedef field::Field<FReal>*  RealField;
 
-        //std::cout << "value from polycube field:" << f->value << std::endl;
+        MeshField meshIn=0;
+        RealField testIn=0;
+
+        for(auto f : fields){
+            if(f->id == 3)
+                meshIn = static_cast<MeshField>(f);
+            if(f->id == 4)
+                testIn = static_cast<RealField>(f);
+        }
+
+        if(testIn->update)
+        {
+            std::cout << "SHAPE testIn ATTRIBUTES:\n"
+                << "fid:" << testIn->id << std::endl
+                << "update:" << testIn->update << std::endl
+                << "puid:" << testIn->puid << std::endl
+                << "pnid:" << testIn->pn << std::endl
+                << "pfid:" << testIn->pf << std::endl
+                << "connected:" << testIn->connected << std::endl
+                << "conn type:" << testIn->conn_type << std::endl
+                << "type:" << testIn->type << std::endl;
+
+            if(testIn->connected)
+                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(testIn->puid,testIn->pn,testIn->pf))->value;
+            // this is for testing purposes
+            // normally you would never modify the node's input
+            for(int i=0; i < meshIn->value.v.size(); i++){
+                meshIn->value.v.at(i).y += testIn->value;
+            }
+            /*
+            for(auto v : meshIn->value.v){
+                std::cout << "modifying y to:" << testIn->value << std::endl;
+                v.y = testIn->value;
+            }*/
+
+            for(auto v : meshIn->value.v){
+                std::cout << "verifying that y is set to:" << v.y << std::endl;
+            }
+        } else {
+            std::cout << "test not set to update\n";
+        }
+
         return status();
     };
 
@@ -196,7 +237,7 @@ namespace feather
             return status();
         }
         //typedef field::Field<FMesh>* MeshOut;
-        typedef field::Field<int>* SubIn;
+        //typedef field::Field<int>* SubIn;
 
         //MeshOut meshOut = static_cast<MeshOut>(fields.at(0));
 

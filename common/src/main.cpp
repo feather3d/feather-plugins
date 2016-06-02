@@ -239,6 +239,7 @@ namespace feather
             etimeIn->update = false;
         }
 
+        std::cout << "LOOKING AT CPOSIN\n\tupdate:" << cposIn->update << std::endl;
         // cpos 
         if(cposIn->update) {
             cposOut->value = cposIn->value;
