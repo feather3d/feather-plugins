@@ -239,6 +239,7 @@ namespace feather
             etimeIn->update = false;
         }
 
+        std::cout << "LOOKING AT CPOSIN\n\tupdate:" << cposIn->update << std::endl;
         // cpos 
         if(cposIn->update) {
             cposOut->value = cposIn->value;
@@ -285,8 +286,11 @@ ADD_FIELD_TO_NODE(MULTIPLY,FNode,field::Node,field::connection::Out,FNode(),2)
 // value 
 ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,0,3)
 // OUT FIELDS
+// multiplier 
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,1,4)
+// OUT FIELDS
 // value 
-ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::Out,0,4)
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::Out,0,5)
 
 namespace feather
 {
@@ -295,12 +299,15 @@ namespace feather
         typedef field::Field<FReal>*  DField;
 
         DField valueIn=0;
+        DField multiplierIn=0;
         DField valueOut=0;
 
         for(auto f : fields){
             if(f->id == 3)
                 valueIn = static_cast<DField>(f);
             if(f->id == 4)
+                multiplierIn = static_cast<DField>(f);
+            if(f->id == 5)
                 valueOut = static_cast<DField>(f);
         }
 
@@ -308,7 +315,7 @@ namespace feather
 
         // value
         if(valueIn->update) {
-            valueOut->value = valueIn->value;
+            valueOut->value = valueIn->value * multiplierIn->value;
             valueIn->update = false;
         }
 
@@ -341,9 +348,11 @@ ADD_FIELD_TO_NODE(DIVIDE,FNode,field::Node,field::connection::Out,FNode(),2)
 // IN FIELDS
 // value 
 ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,0,3)
+// divider 
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,1,4)
 // OUT FIELDS
 // value 
-ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::Out,0,4)
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::Out,0,5)
 
 namespace feather
 {
@@ -352,12 +361,15 @@ namespace feather
         typedef field::Field<FReal>*  DField;
 
         DField valueIn=0;
+        DField dividerIn=0;
         DField valueOut=0;
 
         for(auto f : fields){
             if(f->id == 3)
                 valueIn = static_cast<DField>(f);
             if(f->id == 4)
+                dividerIn = static_cast<DField>(f);
+            if(f->id == 5)
                 valueOut = static_cast<DField>(f);
         }
 
@@ -365,7 +377,7 @@ namespace feather
 
         // value
         if(valueIn->update) {
-            valueOut->value = valueIn->value;
+            valueOut->value = (dividerIn->value != 0) ? 0 : valueIn->value / dividerIn->value;
             valueIn->update = false;
         }
 
