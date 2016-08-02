@@ -1,8 +1,8 @@
 /***********************************************************************
  *
- * Filename: obj.hpp
+ * Filename: io.hpp
  *
- * Description: Code to import and export obj files.
+ * Description: Code to import and export 3d files.
  *
  * Copyright (C) 2015 Richard Layman, rlayman2000@yahoo.com 
  *
@@ -21,8 +21,8 @@
  *
  ***********************************************************************/
 
-#ifndef OBJ_HPP
-#define OBJ_HPP
+#ifndef IO_HPP
+#define IO_HPP
 
 #include <feather/types.hpp>
 #include <feather/deps.hpp>
@@ -123,8 +123,6 @@ BOOST_FUSION_ADAPT_STRUCT(
         )
 
 
-namespace obj 
-{
 
     namespace io
     {
@@ -282,8 +280,6 @@ namespace obj
         template <> feather::status file<IMPORT,OBJ>(obj_data_t& data, std::string filename);
 
     } // namespace io
-
-} // namespace obj 
 
 
 #endif

@@ -1,8 +1,8 @@
 /***********************************************************************
  *
- * Filename: obj.cpp
+ * Filename: io.cpp
  *
- * Description: Code to import and export obj files.
+ * Description: Code to import and export 3d files.
  *
  * Copyright (C) 2015 Richard Layman, rlayman2000@yahoo.com 
  *
@@ -21,9 +21,7 @@
  *
  ***********************************************************************/
 
-#include "obj.hpp"
-
-using namespace obj;
+#include "io.hpp"
 
 
 bool io::load_mesh(mesh_t& mesh, std::string path)

@@ -2,9 +2,9 @@
  *
  * Filename: main.cpp
  *
- * Description: Plugin for importing and exporting obj files.
+ * Description: Plugin for importing and exporting 3d formats.
  *
- * Copyright (C) 2015 Richard Layman, rlayman2000@yahoo.com 
+ * Copyright (C) 2016 Richard Layman, rlayman2000@yahoo.com 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include <feather/command.hpp>
 #include <feather/scenegraph.hpp>
 
-#include "obj.hpp"
+#include "io.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +42,7 @@ extern "C" {
 
 using namespace feather;
 
-PLUGIN_INIT("Obj","Import and export obj format file data.","Richard Layman",0,0)
+PLUGIN_INIT("IO","Import and export different 3d file formats","Richard Layman",0,0)
 
 
 /*
@@ -78,7 +78,7 @@ namespace feather
 
             //return status();
             obj_data_t data;
-            s = obj::io::file<obj::io::IMPORT,obj::io::OBJ>(data,filename);
+            s = io::file<io::IMPORT,io::OBJ>(data,filename);
 
 
             // for each object in the data file, create a node
