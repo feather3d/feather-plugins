@@ -5,7 +5,13 @@ SET(feather_io_SRCS
     main.cpp
 )
 
+set(feather_io_LIBS
+    "-lassimp"
+)
+
 ADD_LIBRARY(feather_io SHARED ${feather_io_SRCS})
+
+TARGET_LINK_LIBRARIES(feather_io ${feather_io_LIBS})
 
 QT5_USE_MODULES(feather_io OpenGL)
 
