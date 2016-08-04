@@ -106,9 +106,12 @@ namespace feather
                 v.y = testIn->value;
             }*/
 
+            // TESTING
+            /*
             for(auto v : meshIn->value.v){
                 std::cout << "verifying that y is set to:" << v.y << std::endl;
             }
+            */
         } else {
             std::cout << "test not set to update\n";
         }

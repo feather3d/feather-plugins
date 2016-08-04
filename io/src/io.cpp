@@ -148,7 +148,70 @@ template <>
 feather::status io::file<io::IMPORT,io::OBJ>(obj_data_t& data, std::string filename)
 {
 
+    // import obj file
+    Assimp::Importer importer;
+
+    const aiScene* scene = importer.ReadFile(filename.c_str(),
+            aiProcess_CalcTangentSpace          |
+            //aiProcess_Triangulate               |
+            aiProcess_JoinIdenticalVertices     |
+            aiProcess_SortByPType);
+
+    // if import failed
+    if(!scene){
+        std::cout << "failed to load " << filename << std::endl;
+        return feather::status(feather::FAILED,"Error! file failed to load");
+    }
+
+    // get number of meshes
+    const int mcount = scene->mNumMeshes;
+    //std::cout << "MESH COUNT " << mcount << std::endl;
+ 
+    // transfer the data for each mesh into the obj data structure
+    for ( int i=0; i < mcount; i++) {
+        object_t obj;
+        obj.o = scene->mMeshes[i]->mName.C_Str();
+        // vertices and normals
+        int vcount = scene->mMeshes[i]->mNumVertices;
+        //std::cout << "VCOUNT for " << obj.o << " = " << vcount << std::endl;
+        for( int j=0; j < vcount; j++){
+            obj.mesh.v.push_back(feather::FVertex3D(scene->mMeshes[i]->mVertices[j][0], scene->mMeshes[i]->mVertices[j][1], scene->mMeshes[i]->mVertices[j][2]));
+            obj.mesh.vn.push_back(feather::FVertex3D(scene->mMeshes[i]->mNormals[j][0], scene->mMeshes[i]->mNormals[j][1], scene->mMeshes[i]->mNormals[j][2]));
+        }
+        // st 
+        int stcount = scene->mMeshes[i]->mNumUVComponents[2];
+        //std::cout << "STCOUNT for " << obj.o << " = " << stcount << std::endl;
+
+        // TODO
+        // I need to add support for UV mapping
+        for( int j=0; j < stcount; j++){
+            //obj.mesh.st.push_back(feather::FVertex3D(scene->mMeshes[i]->mVertices[j][0], scene->mMeshes[i]->mVertices[j][1], scene->mMeshes[i]->mVertices[j][2]));
+        }
+        // faces
+        int fcount = scene->mMeshes[i]->mNumFaces;
+        //std::cout << "FCOUNT for " << obj.o << " = " << fcount << std::endl;
+        smoothing_group_t sgroup;
+        sgroup.s = 0; // smoothing
+        for( int j=0; j < fcount; j++){
+            feather::FFace face;
+            int icount = scene->mMeshes[i]->mFaces->mNumIndices;
+            //std::cout << "face i count=" << icount << "\nface data" << std::endl;
+            for( int k=0; k < icount; k++){
+                //std::cout << scene->mMeshes[i]->mFaces[j].mIndices[k] << ",";
+                feather::FFacePoint fp = feather::FFacePoint(scene->mMeshes[i]->mFaces[j].mIndices[k],0,scene->mMeshes[i]->mFaces[j].mIndices[k]);
+                face.push_back(fp); 
+            }
+            sgroup.f.push_back(face);
+            //std::cout << std::endl;
+        }
+        group_t group;
+        group.sg.push_back(sgroup);
+        obj.grp.push_back(group); 
+        data.object.push_back(obj);
+    } 
+
+
     std::cout << "parsing error in \"" << filename << "\" obj file\n";
 
-    return feather::status(feather::FAILED,"parsing error");
+    return feather::status();
 }
