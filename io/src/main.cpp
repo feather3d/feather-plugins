@@ -55,8 +55,27 @@ namespace feather
 {
     namespace command
     {
-        enum Command { N=0, IMPORT_OBJ, EXPORT_OBJ };
+        enum Command { N=0, OPEN_FEATHER, SAVE_FEATHER, IMPORT_OBJ, EXPORT_OBJ };
 
+        // open feather file
+        status open_feather(parameter::ParameterList params) {
+            std::string filename;
+            bool p = false;
+            p = params.getParameterValue<std::string>("filename",filename); 
+            std::cout << "open feather filename:" << filename << std::endl; 
+            return status();
+        };
+
+        // save feather file 
+        status save_feather(parameter::ParameterList params) {
+            std::string filename;
+            bool p = false;
+            p = params.getParameterValue<std::string>("filename",filename); 
+            std::cout << "save feather filename:" << filename << std::endl; 
+            return status();
+        };
+
+        // import obj file
         status import_obj(parameter::ParameterList params) {
             feather::status s;
             std::string filename;
@@ -133,6 +152,7 @@ namespace feather
             return s;
         };
 
+        // export obj file
         status export_obj(parameter::ParameterList params) {
             std::cout << "running export_obj command" << std::endl;
             return status();
@@ -141,6 +161,16 @@ namespace feather
     } // namespace command
 
 } // namespace feather
+
+// Open Feather Command
+ADD_COMMAND("open_feather",OPEN_FEATHER,open_feather)
+
+ADD_PARAMETER(command::OPEN_FEATHER,1,parameter::String,"filename")
+
+// Save Feather Command
+ADD_COMMAND("save_feather",SAVE_FEATHER,save_feather)
+
+ADD_PARAMETER(command::SAVE_FEATHER,1,parameter::String,"filename")
 
 // Import Obj Command
 ADD_COMMAND("import_obj",IMPORT_OBJ,import_obj)
