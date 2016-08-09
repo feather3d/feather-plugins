@@ -31,6 +31,7 @@
 #include <feather/scenegraph.hpp>
 
 #include "io.hpp"
+#include "feather.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,6 +83,8 @@ namespace feather
             // get time node
             unsigned int uid;
             feather::scenegraph::get_node_by_name("time",uid);            
+            io::save_feather(filename);
+ 
             // we already know the fid's for the values
             double stime = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,7))->value;
             double etime = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,8))->value;

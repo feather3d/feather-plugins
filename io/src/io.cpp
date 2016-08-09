@@ -23,7 +23,6 @@
 
 #include "io.hpp"
 
-
 bool io::load_mesh(mesh_t& mesh, std::string path)
 {
     return true;

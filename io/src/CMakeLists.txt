@@ -2,6 +2,7 @@ PROJECT(feather_io)
 
 SET(feather_io_SRCS
     io.cpp
+    feather.cpp
     main.cpp
 )
 
@@ -11,7 +12,10 @@ set(feather_io_LIBS
 
 ADD_LIBRARY(feather_io SHARED ${feather_io_SRCS})
 
-TARGET_LINK_LIBRARIES(feather_io ${feather_io_LIBS})
+TARGET_LINK_LIBRARIES(feather_io 
+    /usr/lib/feather/libfeather_plugin.so
+    ${feather_io_LIBS}
+)
 
 QT5_USE_MODULES(feather_io OpenGL)
 
