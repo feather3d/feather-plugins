@@ -27,14 +27,16 @@
 using namespace feather;
 
 bool io::open_feather(std::string filename) {
-    unsigned int uid = plugin::get_node_by_name("time");
+    unsigned int uid;
+    plugin::get_node_by_name("time",uid);
 
     return true;
 }
 
 
 bool io::save_feather(std::string filename) {
-    unsigned int uid = plugin::get_node_by_name("time");
+    unsigned int uid;
+    plugin::get_node_by_name("time",uid);
 
     std::cout << "saved filename is " << filename << " and the time uid is " << uid << std::endl;
 
