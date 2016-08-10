@@ -72,47 +72,9 @@ namespace feather
             std::string filename;
             bool p = false;
             p = params.getParameterValue<std::string>("filename",filename); 
-            
-            std::fstream file;
-            file.open(filename,std::ios_base::out|std::ios_base::binary|std::ios_base::trunc);
 
-            std::stringstream data;
-
-            data << "<header>";
-            data << 0 << 1; // version number
-            // get time node
-            unsigned int uid;
-            feather::scenegraph::get_node_by_name("time",uid);            
             io::save_feather(filename);
- 
-            // we already know the fid's for the values
-            double stime = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,7))->value;
-            double etime = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,8))->value;
-            double ctime = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,9))->value;
-            double fps = static_cast<feather::field::Field<double>*>(feather::scenegraph::get_fieldBase(uid,10))->value;
-            data << stime << etime << ctime << fps;
-            // header data
-            data << "<plugins>";
-            // plugin names
-            data << "</plugins>";
-            data << "<nodes>";
-            // plugin names
-            data << "</nodes>";
-            data << "</header>";
-            data << "<data>";
-            // data
-            data << "</data>";
-            data << "<conn>";
-            // connections
-            data << "</conn>";
-
-            std::istreambuf_iterator<char> src(data.rdbuf());
-            std::istreambuf_iterator<char> end;
-            std::ostreambuf_iterator<char> dest(file);
-            std::copy(src,end,dest);
-
-            file.close();
-
+            
             return status();
         };
 
