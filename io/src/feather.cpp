@@ -31,7 +31,19 @@ bool io::feather_format::open(std::string filename) {
     unsigned int uid;
     plugin::get_node_by_name("time",uid);
 
+    std::fstream file;
+    file.open(filename,std::ios_base::in|std::ios_base::binary);
 
+    file.seekg(8);
+    header_t header;
+    file.read((char*)&header,sizeof(header));
+
+    std::cout << "sframe = " << header.stime << std::endl
+        << "eframe = " << header.etime << std::endl
+        << "cframe = " << header.ctime << std::endl
+        << "fps = " << header.fps << std::endl;
+
+    file.close();
 
     return true;
 }

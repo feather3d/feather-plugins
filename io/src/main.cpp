@@ -64,6 +64,9 @@ namespace feather
             bool p = false;
             p = params.getParameterValue<std::string>("filename",filename); 
             std::cout << "open feather filename:" << filename << std::endl; 
+
+            io::feather_format::open(filename);
+ 
             return status();
         };
 
