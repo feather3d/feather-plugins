@@ -28,14 +28,26 @@
 #include <feather/deps.hpp>
 #include <feather/status.hpp>
 
-
-
 namespace io 
 {
 
-    bool open_feather(std::string filename);
+    namespace feather_format
+    {
 
-    bool save_feather(std::string filename);
+        struct header_t {
+            unsigned short major; // version number
+            unsigned short minor; // version number
+            double stime;
+            double etime;
+            double ctime;
+            double fps;
+        };
+
+        bool open(std::string filename);
+
+        bool save(std::string filename);
+
+    } // namespace feather
 
 } // namespace io
 

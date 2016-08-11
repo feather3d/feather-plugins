@@ -73,7 +73,7 @@ namespace feather
             bool p = false;
             p = params.getParameterValue<std::string>("filename",filename); 
 
-            io::save_feather(filename);
+            io::feather_format::save(filename);
             
             return status();
         };

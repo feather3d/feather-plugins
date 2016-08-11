@@ -23,18 +23,21 @@
 
 #include "feather.hpp"
 #include <feather/plugin.hpp>
+#include <feather/field.hpp>
 
 using namespace feather;
 
-bool io::open_feather(std::string filename) {
+bool io::feather_format::open(std::string filename) {
     unsigned int uid;
     plugin::get_node_by_name("time",uid);
+
+
 
     return true;
 }
 
 
-bool io::save_feather(std::string filename) {
+bool io::feather_format::save(std::string filename) {
     std::fstream file;
     file.open(filename,std::ios_base::out|std::ios_base::binary|std::ios_base::trunc);
 
@@ -44,22 +47,19 @@ bool io::save_feather(std::string filename) {
     plugin::get_node_by_name("time",uid);
     std::cout << "saved filename is " << filename << " and the time uid is " << uid << std::endl;
 
+    header_t header;
+
     data << "<header>";
-    data << 0 << 1; // version number
+    //data << 0 << 1; // version number
+    header.major = 0;
+    header.minor = 1;
+    header.stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,7))->value;
+    header.etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,8))->value;
+    header.ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,9))->value;
+    header.fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,10))->value;
 
-    // we already know the fid's for the values
-    /*
-    double stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,7))->value;
-    double etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,8))->value;
-    double ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,9))->value;
-    double fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,10))->value;
-    */
-    GET_FIELD_VALUE(double,uid,7,stime)
-    GET_FIELD_VALUE(double,uid,8,etime)
-    GET_FIELD_VALUE(double,uid,9,ctime)
-    GET_FIELD_VALUE(double,uid,10,fps)
+    data.write((char*)&header,sizeof(header));
 
-    data << stime << etime << ctime << fps;
     // header data
     data << "<plugins>";
     // plugin names
@@ -81,7 +81,6 @@ bool io::save_feather(std::string filename) {
     std::copy(src,end,dest);
 
     file.close();
-
 
     return true;
 }
