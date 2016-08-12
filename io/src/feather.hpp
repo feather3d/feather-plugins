@@ -41,6 +41,22 @@ namespace io
             double etime;
             double ctime;
             double fps;
+            unsigned int nodecount; // how many nodes in the scenegraph
+            unsigned int linkcount; // how many nodes in the scenegraph
+        };
+
+        struct node_t {
+            unsigned int uid;
+            unsigned int nid;
+            unsigned short namelength;
+            char* name;
+        };
+
+        struct link_t {
+            unsigned int suid;
+            unsigned int sfid;
+            unsigned int tuid;
+            unsigned int tfid;
         };
 
         bool open(std::string filename);

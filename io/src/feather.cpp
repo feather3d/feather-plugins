@@ -34,14 +34,17 @@ bool io::feather_format::open(std::string filename) {
     std::fstream file;
     file.open(filename,std::ios_base::in|std::ios_base::binary);
 
-    file.seekg(8);
+    file.seekg(0);
     header_t header;
     file.read((char*)&header,sizeof(header));
 
-    std::cout << "sframe = " << header.stime << std::endl
+    std::cout << "version = " << header.major << "." << header.minor << std::endl
+        << "sframe = " << header.stime << std::endl
         << "eframe = " << header.etime << std::endl
         << "cframe = " << header.ctime << std::endl
-        << "fps = " << header.fps << std::endl;
+        << "fps = " << header.fps << std::endl
+        << "node count = " << header.nodecount << std::endl
+        << "link count = " << header.linkcount << std::endl;
 
     file.close();
 
@@ -55,43 +58,36 @@ bool io::feather_format::save(std::string filename) {
 
     std::stringstream data;
 
-    unsigned int uid;
-    plugin::get_node_by_name("time",uid);
-    std::cout << "saved filename is " << filename << " and the time uid is " << uid << std::endl;
+    unsigned int time_uid;
+    plugin::get_node_by_name("time",time_uid);
+    std::vector<unsigned int> uids; // all the scenegraph uids
+    plugin::get_nodes(uids);
 
     header_t header;
 
-    data << "<header>";
-    //data << 0 << 1; // version number
     header.major = 0;
     header.minor = 1;
-    header.stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,7))->value;
-    header.etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,8))->value;
-    header.ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,9))->value;
-    header.fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(uid,10))->value;
+    header.stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,7))->value;
+    header.etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,8))->value;
+    header.ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,9))->value;
+    header.fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,10))->value;
+    header.nodecount = uids.size();
+    header.linkcount = 10;
+    file.write((char*)&header,sizeof(header));
 
-    data.write((char*)&header,sizeof(header));
-
-    // header data
-    data << "<plugins>";
-    // plugin names
-    data << "</plugins>";
-    data << "<nodes>";
-    // plugin names
-    data << "</nodes>";
-    data << "</header>";
-    data << "<data>";
-    // data
-    data << "</data>";
-    data << "<conn>";
-    // connections
-    data << "</conn>";
-
-    std::istreambuf_iterator<char> src(data.rdbuf());
-    std::istreambuf_iterator<char> end;
-    std::ostreambuf_iterator<char> dest(file);
-    std::copy(src,end,dest);
-
+    // add all the nodes
+    for (unsigned int uid : uids){
+        node_t node;
+        status p;
+        node.uid = uid;
+        node.nid = plugin::get_node_id(uid,p);
+        std::string name;
+        plugin::get_node_name(uid,name,p);
+        node.namelength = strlen(name.c_str());
+        node.name = (char*)name.c_str();
+        file.write((char*)&node,sizeof(node));
+    }
+ 
     file.close();
 
     return true;
