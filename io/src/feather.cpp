@@ -75,6 +75,8 @@ bool io::feather_format::save(std::string filename) {
     header.linkcount = 10;
     file.write((char*)&header,sizeof(header));
 
+    std::vector<link_t> links; // container for all connections
+
     // add all the nodes
     for (unsigned int uid : uids){
         node_t node;
@@ -86,6 +88,31 @@ bool io::feather_format::save(std::string filename) {
         node.namelength = strlen(name.c_str());
         node.name = (char*)name.c_str();
         file.write((char*)&node,sizeof(node));
+        // get all the node's out field connections
+        std::vector<unsigned int> fids;
+        // we are going to use the in connections to get the links since
+        // the out fields can have multiple links but the in fields can
+        // only have one
+        p = plugin::get_in_fields(uid,fids);
+        for (unsigned int fid : fids){
+            field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
+            if(srcfield->connected){
+                link_t link;
+                link.suid = srcfield->puid;
+                link.sfid = srcfield->pf;
+                link.tuid = uid;
+                link.tfid = fid;
+                links.push_back(link);
+            } 
+        } 
+    }
+
+    for ( auto link : links ) {
+        std::cout << "found link: suid:" << link.suid
+            << " sfid:" << link.sfid
+            << " --> tuid:" << link.tuid
+            << " tfid:" << link.tfid
+            << std::endl;
     }
  
     file.close();
