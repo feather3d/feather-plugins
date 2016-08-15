@@ -34,11 +34,11 @@ bool io::feather_format::open(std::string filename) {
     plugin::clear();
 
     std::fstream file;
-    file.open(filename,std::ios_base::in|std::ios_base::binary);
+    file.open(filename.c_str(),std::ios_base::in|std::ios_base::binary);
 
     file.seekg(0);
     header_t header;
-    file.read((char*)&header,sizeof(header));
+    file.read((char*)&header,sizeof(header_t));
 
     std::cout << "version = " << header.major << "." << header.minor << std::endl
         << "sframe = " << header.stime << std::endl
@@ -51,12 +51,15 @@ bool io::feather_format::open(std::string filename) {
     for(unsigned int i=0; i < header.nodecount; i++){
         node_t node;
         file.read((char*)&node,sizeof(node_t));
-        char* cname;
-        std::cout << "name length = " << node.namelength << std::endl;
-        file.read(cname,node.namelength);
-        std::string name(cname); 
-        std::cout << "name is " << name << " and to add_node\n";
-        //unsigned int uid = plugin::add_node(node.nid,name,p);
+        char cname[node.namelength];
+        //std::cout << "name length = " << node.namelength << std::endl;
+        file.read((char*)&cname,node.namelength);
+        std::string name;
+        name.insert(0,cname,node.namelength); 
+        std::cout << "name is " << name << ", length = " << name.size() << std::endl;
+
+        unsigned int uid = plugin::add_node(node.nid,name,p);
+
         std::cout << "NODE INFO FOR: " << name  << std::endl 
             << "\tuid:" << node.uid << std::endl
             << "\tnid:" << node.nid << std::endl
@@ -73,10 +76,14 @@ bool io::feather_format::open(std::string filename) {
                 << "\tsfid:" << link.sfid << std::endl
                 << "\ttuid:" << link.tuid << std::endl
                 << "\ttfid:" << link.tfid << std::endl;
+
+            plugin::connect(link.suid,link.sfid,link.tuid,link.tfid);
         }
 
         // NODE DATA
         for(unsigned int j=0; j < node.datacount; j++) {
+            std::cout << "step 1\n";
+
             data_t data;
             file.read((char*)&data,sizeof(data_t));
             std::cout << "\tDATA INFO" << std::endl 
@@ -88,8 +95,8 @@ bool io::feather_format::open(std::string filename) {
             int ival;
             float fval;
             double dval;
- 
-            switch(data.type){
+               
+            switch(srcfield->type){
                 case field::Int:
                     file.read((char*)&ival,sizeof(int));
                     static_cast<field::Field<int>*>(srcfield)->value = ival;
@@ -184,8 +191,10 @@ bool io::feather_format::save(std::string filename) {
         }
 
         // write the node info
-        file.write((char*)&node,sizeof(node));
-        file.write(name.c_str(),name.size());
+        file.write((char*)&node,sizeof(node_t));
+        file.write((char*)name.c_str(),node.namelength);
+
+        std::cout << "NODE NAME = [" << name << "], namelength=" << node.namelength << ", c_str() length=" << sizeof(name.c_str()) << std::endl;
 
         std::cout << "NODE INFO FOR: " << name  << std::endl 
             << "\tuid:" << node.uid << std::endl
@@ -203,21 +212,21 @@ bool io::feather_format::save(std::string filename) {
                 link.tuid = uid;
                 link.tfid = fid;
                 links.push_back(link);
-           } else {
+            } else {
                 data_t fieldinfo;
                 fieldinfo.fid = fid;
                 fieldinfo.type = srcfield->type;
                 switch(srcfield->type){
                     case field::Int:
-                        fieldinfo.length = sizeof(unsigned int);
+                        fieldinfo.length = sizeof(int);
                         break;
                     case field::Float:
                         fieldinfo.length = sizeof(float);
                         break;
-                     case field::Double:
+                    case field::Double:
                         fieldinfo.length = sizeof(double);
                         break;
-                     case field::Real:
+                    case field::Real:
                         fieldinfo.length = sizeof(double);
                         break;
                     default:
@@ -232,57 +241,61 @@ bool io::feather_format::save(std::string filename) {
                         fieldinfo.type == field::Double ||
                         fieldinfo.type == field::Real )
                     fielddata.push_back(fieldinfo);
-           } 
 
+            } 
 
-            for ( link_t link : links ) {
-                field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
-                file.write((char*)&link,sizeof(link_t));
-                std::cout << "\tLINK INFO" << std::endl 
-                    << "\tsuid:" << link.suid << std::endl
-                    << "\tsfid:" << link.sfid << std::endl
-                    << "\ttuid:" << link.tuid << std::endl
-                    << "\ttfid:" << link.tfid << std::endl;
-             } 
+        }
 
-            for ( data_t fieldinfo : fielddata ) {
-                field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fieldinfo.fid);
-                file.write((char*)&fieldinfo,sizeof(data_t));
-                unsigned int ival;
-                float fval;
-                double dval;
-                switch(srcfield->type){
-                    case field::Int:
-                        ival = static_cast<field::Field<unsigned int>*>(srcfield)->value;
-                        file.write((char*)&ival,fieldinfo.length);
-                        break;
-                    case field::Float:
-                        fval = static_cast<field::Field<float>*>(srcfield)->value;
-                        file.write((char*)&fval,fieldinfo.length);
-                        break;
-                    case field::Double:
-                        dval = static_cast<field::Field<double>*>(srcfield)->value;
-                        file.write((char*)&dval,fieldinfo.length);
-                        break;
-                    case field::Real:
-                        dval = static_cast<field::Field<double>*>(srcfield)->value;
-                        file.write((char*)&dval,fieldinfo.length);
-                        break;
-                        // field::Node can be skipped since it only for connections
-                    default:
-                        std::cout << "FAILED TO FIND VALUE TYPE!\n";
-                        break;
-                };
+        for ( link_t link : links ) {
+            field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,link.tfid);
+            file.write((char*)&link,sizeof(link_t));
+            std::cout << "\tLINK INFO" << std::endl 
+                << "\tsuid:" << link.suid << std::endl
+                << "\tsfid:" << link.sfid << std::endl
+                << "\ttuid:" << link.tuid << std::endl
+                << "\ttfid:" << link.tfid << std::endl;
+        } 
 
-                std::cout << "\tDATA INFO" << std::endl 
-                    << "\tfid:" << fieldinfo.fid << std::endl
-                    << "\ttype:" << fieldinfo.type << std::endl
-                    << "\tlength:" << fieldinfo.length << std::endl;
+        for ( data_t fieldinfo : fielddata ) {
+            field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fieldinfo.fid);
+            file.write((char*)&fieldinfo,sizeof(data_t));
+            unsigned int ival;
+            float fval;
+            double dval;
+            switch(srcfield->type){
+                case field::Int:
+                    ival = static_cast<field::Field<int>*>(srcfield)->value;
+                    file.write((char*)&ival,fieldinfo.length);
+                    break;
+                case field::Float:
+                    fval = static_cast<field::Field<float>*>(srcfield)->value;
+                    file.write((char*)&fval,fieldinfo.length);
+                    break;
+                case field::Double:
+                    dval = static_cast<field::Field<double>*>(srcfield)->value;
+                    file.write((char*)&dval,fieldinfo.length);
+                    break;
+                case field::Real:
+                    dval = static_cast<field::Field<double>*>(srcfield)->value;
+                    file.write((char*)&dval,fieldinfo.length);
+                    break;
+                    // field::Node can be skipped since it only for connections
+                default:
+                    std::cout << "FAILED TO FIND VALUE TYPE!\n";
+                    break;
+            };
 
-            }
+            std::cout << "\tDATA INFO" << std::endl 
+                << "\tfid:" << fieldinfo.fid << std::endl
+                << "\ttype:" << fieldinfo.type << std::endl
+                << "\tlength:" << fieldinfo.length << std::endl;
+
         }
     }
 
+    // terminating string to verify the file saved correctly
+    file.write("<eof>",6);
+ 
     file.close();
 
     return true;
