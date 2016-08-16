@@ -82,7 +82,7 @@ namespace feather
 } // namespace feather
 
 // TODO add icon path
-NODE_INIT(ANIMATION_KEY,node::Animation,"")
+NODE_INIT(ANIMATION_KEY,node::Animation,"key.svg")
 
 
 /*
@@ -106,7 +106,7 @@ namespace feather
 } // namespace feather
 
 // TODO add icon path
-NODE_INIT(ANIMATION_KEYTRACK,node::Animation,"")
+NODE_INIT(ANIMATION_KEYTRACK,node::Animation,"track.svg")
 
 
 /*
