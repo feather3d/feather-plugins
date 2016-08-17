@@ -10,6 +10,10 @@ ADD_DEFINITIONS("-D GL_GLEXT_PROTOTYPES")
 
 ADD_LIBRARY(feather_animation SHARED ${feather_animation_SRCS})
 
+TARGET_LINK_LIBRARIES(feather_animation
+    /usr/lib/feather/libfeather_plugin.so
+)
+
 QT5_USE_MODULES(feather_animation OpenGL)
 
 SET_TARGET_PROPERTIES(feather_animation

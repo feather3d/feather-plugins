@@ -27,8 +27,9 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
-#include <feather/scenegraph.hpp>
+//#include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
+#include <feather/plugin.hpp>
 #include <QColor>
 
 #ifdef __cplusplus
@@ -207,10 +208,34 @@ namespace feather
 {
     namespace command
     {
-        enum Command { N=0 };
+        enum Command { N=0, ADD_KEY };
 
+        // add key
+        status add_key(parameter::ParameterList params) {
+            double time; 
+            bool pass = params.getParameterValue<double>("time",time);
+            if(!pass)
+                return status(FAILED,"time parameter failed");
+
+            // add key to scenegraph
+            status p;
+            unsigned int uid = plugin::add_node(ANIMATION_INT_KEY,"key",p);
+        
+            // connect to the root for now
+            plugin::connect(0,2,uid,1);
+        
+            // update scenegraph            
+            plugin::update();
+            
+            std::cout << "add_key command found\n";
+ 
+            return status();
+        };
     } // namespace command
 
 } // namespace feather
 
-INIT_COMMAND_CALLS(N)
+ADD_COMMAND("add_key",ADD_KEY,add_key)
+ADD_PARAMETER(command::ADD_KEY,1,parameter::Real,"time")
+
+INIT_COMMAND_CALLS(ADD_KEY)
