@@ -41,37 +41,44 @@ extern "C" {
 
 using namespace feather;
 
-#define ANIMATION_KEY 420
-#define ANIMATION_KEYTRACK 421
+#define ANIMATION_INT_KEY 420
+#define ANIMATION_REAL_KEY 421
+#define ANIMATION_INT_KEYTRACK 425
+#define ANIMATION_REAL_KEYTRACK 426
 
-PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEY,ANIMATION_KEYTRACK)
+PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_INT_KEY,ANIMATION_REAL_KEYTRACK)
+
 
 /*
  ***************************************
- *            ANIMATION KEY            *
+ *            ANIMATION INT KEY        *
  ***************************************
 */
 
 // parent
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FNode,field::Node,field::connection::In,FNode(),1)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FNode,field::Node,field::connection::In,FNode(),1)
 // child
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FNode,field::Node,field::connection::Out,FNode(),2)
-
-// meshIn
-//ADD_FIELD_TO_NODE(ANIMATION_KEY,FMesh,field::Mesh,field::connection::In,FMesh(),3)
-// testIn
-//ADD_FIELD_TO_NODE(ANIMATION_KEY,FReal,field::Real,field::connection::In,1,4)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FNode,field::Node,field::connection::Out,FNode(),2)
+// time 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FReal,field::Real,field::connection::In,0.0,3)
+// value
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,4)
+// in curve type 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,5)
+// out curve type 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,6)
+// add curve vectors
 
 namespace feather
 {
 
-    DO_IT(ANIMATION_KEY)
+    DO_IT(ANIMATION_INT_KEY)
     { 
         return status();
     };
 
     /*
-    DRAW_IT(ANIMATION_KEY)
+    DRAW_IT(ANIMATION_INT_KEY)
     {
         std::cout << "ANIMATION_KEY DRAW IT\n";
         ADD_MESH(3)
@@ -82,23 +89,73 @@ namespace feather
 } // namespace feather
 
 // TODO add icon path
-NODE_INIT(ANIMATION_KEY,node::Animation,"key.svg")
+NODE_INIT(ANIMATION_INT_KEY,node::Animation,"key.svg")
 
 
 /*
  ***************************************
- *            ANIMATION TRACK          *
+ *            ANIMATION REAL KEY       *
  ***************************************
 */
+
 // parent
-ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FNode,field::Node,field::connection::In,FNode(),1)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FNode,field::Node,field::connection::In,FNode(),1)
 // child
-ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FNode,field::Node,field::connection::Out,FNode(),2)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FNode,field::Node,field::connection::Out,FNode(),2)
+// time 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,3)
+// value
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,4)
+// in curve type 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,5)
+// out curve type 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,6)
+// add curve vectors
 
 namespace feather
 {
 
-    DO_IT(ANIMATION_KEYTRACK)
+    DO_IT(ANIMATION_REAL_KEY)
+    { 
+        return status();
+    };
+
+    /*
+    DRAW_IT(ANIMATION_REAL_KEY)
+    {
+        std::cout << "ANIMATION_KEY DRAW IT\n";
+        ADD_MESH(3)
+        return status();    
+    };
+    */
+
+} // namespace feather
+
+// TODO add icon path
+NODE_INIT(ANIMATION_REAL_KEY,node::Animation,"key.svg")
+
+
+
+/*
+ ***************************************
+ *            ANIMATION INT TRACK      *
+ ***************************************
+*/
+// parent
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNode,field::Node,field::connection::Out,FNode(),2)
+// time 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FReal,field::Real,field::connection::In,0.0,3)
+// keys 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),4)
+// value 
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FInt,field::Int,field::connection::Out,0.0,5)
+
+namespace feather
+{
+
+    DO_IT(ANIMATION_INT_KEYTRACK)
     { 
         return status();
     };
@@ -106,7 +163,38 @@ namespace feather
 } // namespace feather
 
 // TODO add icon path
-NODE_INIT(ANIMATION_KEYTRACK,node::Animation,"track.svg")
+NODE_INIT(ANIMATION_INT_KEYTRACK,node::Animation,"track.svg")
+
+
+/*
+ ***************************************
+ *            ANIMATION REAL TRACK     *
+ ***************************************
+*/
+// parent
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNode,field::Node,field::connection::In,FNode(),1)
+// child
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNode,field::Node,field::connection::Out,FNode(),2)
+// time 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::In,0.0,3)
+// keys 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),4)
+// value 
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,5)
+
+namespace feather
+{
+
+    DO_IT(ANIMATION_REAL_KEYTRACK)
+    { 
+        return status();
+    };
+
+} // namespace feather
+
+// TODO add icon path
+NODE_INIT(ANIMATION_REAL_KEYTRACK,node::Animation,"track.svg")
+
 
 
 /*
