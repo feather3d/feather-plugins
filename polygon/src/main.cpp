@@ -86,15 +86,17 @@ namespace feather
             std::cout << "SHAPE testIn ATTRIBUTES:\n"
                 << "fid:" << testIn->id << std::endl
                 << "update:" << testIn->update << std::endl
-                << "puid:" << testIn->puid << std::endl
-                << "pnid:" << testIn->pn << std::endl
-                << "pfid:" << testIn->pf << std::endl
-                << "connected:" << testIn->connected << std::endl
+                //<< "puid:" << testIn->puid << std::endl
+                //<< "pnid:" << testIn->pn << std::endl
+                //<< "pfid:" << testIn->pf << std::endl
+                << "connected:" << testIn->connected() << std::endl
                 << "conn type:" << testIn->conn_type << std::endl
                 << "type:" << testIn->type << std::endl;
 
-            if(testIn->connected)
-                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(testIn->puid,testIn->pn,testIn->pf))->value;
+            if(testIn->connected()) {
+                field::Connection conn = testIn->connections.at(0);
+                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid))->value;
+            }
             // this is for testing purposes
             // normally you would never modify the node's input
             for(int i=0; i < meshIn->value.v.size(); i++){

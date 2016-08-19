@@ -184,7 +184,7 @@ bool io::feather_format::save(std::string filename) {
         // do a quick scan to get the link and data counts
         for (unsigned int fid : fids) {
             field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
-            if(srcfield->connected)
+            if(srcfield->connected())
                 node.linkcount++;
             else
                 node.datacount++;
@@ -205,10 +205,11 @@ bool io::feather_format::save(std::string filename) {
 
         for (unsigned int fid : fids) {
             field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
-            if(srcfield->connected){
+            if(srcfield->connected()){
                 link_t link;
-                link.suid = srcfield->puid;
-                link.sfid = srcfield->pf;
+                field::Connection conn = srcfield->connections.at(0);
+                link.suid = conn.puid;
+                link.sfid = conn.pfid;
                 link.tuid = uid;
                 link.tfid = fid;
                 links.push_back(link);
