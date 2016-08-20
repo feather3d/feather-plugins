@@ -108,7 +108,7 @@ namespace feather
 
             // for each object in the data file, create a node
             // and connect it to the root for now
-            int uid = 0;
+            unsigned int uid = 0;
             int vstep = 0;
 
             for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
@@ -127,7 +127,7 @@ namespace feather
                     sourcefield sf=NULL;
 
                     // NOTE: you can't call feather::sg[uid] from here - you will get a seg fault 
-                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(uid,320,3));
+                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(uid,320,3,0));
                     if(sf){
                         // only going to do the first object as a test
                         // fill in the mesh

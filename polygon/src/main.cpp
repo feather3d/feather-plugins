@@ -95,7 +95,7 @@ namespace feather
 
             if(testIn->connected()) {
                 field::Connection conn = testIn->connections.at(0);
-                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid))->value;
+                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
             }
             // this is for testing purposes
             // normally you would never modify the node's input
