@@ -134,16 +134,6 @@ namespace feather
                         sf->value.assign_v(objdata.mesh.v);
                         sf->value.assign_st(objdata.mesh.st);
                         sf->value.assign_vn(objdata.mesh.vn);
-                        // obj v indexes are 1 based and need to be converted to 0 based
-                        for_each(objdata.grp.at(0).sg.at(0).f.begin(), objdata.grp.at(0).sg.at(0).f.end(), [&vstep](feather::FFace& f){
-                            //std::cout << "face with vstep:" << vstep << std::endl;
-                            for_each(f.begin(), f.end(),[&vstep](feather::FFacePoint& fp){
-                                fp.v=fp.v-(1+vstep);
-                                fp.vn=fp.vn-(1+vstep);
-                                //std::cout << "assigning vp:" << fp.v << " ";
-                            });
-                            //std::cout << std::endl;
-                        });
                         sf->value.assign_f(objdata.grp.at(0).sg.at(0).f);
                         vstep += objdata.mesh.v.size();
                     }

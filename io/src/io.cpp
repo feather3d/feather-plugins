@@ -201,7 +201,7 @@ feather::status io::file<io::IMPORT,io::OBJ>(obj_data_t& data, std::string filen
                 face.push_back(fp); 
             }
             sgroup.f.push_back(face);
-            //std::cout << std::endl;
+            std::cout << std::endl;
         }
         group_t group;
         group.sg.push_back(sgroup);

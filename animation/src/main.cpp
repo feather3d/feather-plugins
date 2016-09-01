@@ -220,7 +220,13 @@ namespace feather
             // add key to scenegraph
             status p;
             unsigned int uid = plugin::add_node(ANIMATION_INT_KEY,"key",p);
-        
+
+            // set the time of the key
+            typedef field::Field<feather::FReal>* sourcefield;
+            sourcefield sf=NULL;
+            sf = static_cast<sourcefield>(feather::plugin::get_node_field_base(uid,3));
+            sf->value = time;
+
             // connect to the root for now
             plugin::connect(0,2,uid,1);
         
