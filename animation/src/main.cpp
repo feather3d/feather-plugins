@@ -237,6 +237,7 @@ namespace feather
  
             return status();
         };
+
     } // namespace command
 
 } // namespace feather

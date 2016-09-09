@@ -29,6 +29,7 @@
 #include <feather/command.hpp>
 #include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
+#include <feather/tools.hpp>
 #include <QColor>
 
 #ifdef __cplusplus
@@ -60,8 +61,10 @@ ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::Out,FNode()
 
 // meshIn
 ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),3)
-// testIn
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FReal,field::Real,field::connection::In,1,4)
+// xformIn 
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMatrix4x4,field::Matrix4x4,field::connection::In,FMatrix4x4(),4)
+// xformIn 
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
 
 namespace feather
 {
@@ -69,20 +72,24 @@ namespace feather
     DO_IT(POLYGON_SHAPE)
     { 
         typedef field::Field<FMesh>*  MeshField;
-        typedef field::Field<FReal>*  RealField;
+        typedef field::Field<FMatrix4x4>*  MatrixField;
 
         MeshField meshIn=0;
-        RealField testIn=0;
+        MeshField meshOut=0;
+        MatrixField xformIn=0;
 
         for(auto f : fields){
             if(f->id == 3)
                 meshIn = static_cast<MeshField>(f);
             if(f->id == 4)
-                testIn = static_cast<RealField>(f);
-        }
+                xformIn = static_cast<MatrixField>(f);
+            if(f->id == 5)
+                meshOut = static_cast<MeshField>(f);
+         }
 
-        if(testIn->update)
+        if(xformIn->update)
         {
+            /* 
             std::cout << "SHAPE testIn ATTRIBUTES:\n"
                 << "fid:" << testIn->id << std::endl
                 << "update:" << testIn->update << std::endl
@@ -92,28 +99,33 @@ namespace feather
                 << "connected:" << testIn->connected() << std::endl
                 << "conn type:" << testIn->conn_type << std::endl
                 << "type:" << testIn->type << std::endl;
-
-            if(testIn->connected()) {
-                field::Connection conn = testIn->connections.at(0);
-                testIn->value = static_cast<RealField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-            }
-            // this is for testing purposes
-            // normally you would never modify the node's input
-            for(int i=0; i < meshIn->value.v.size(); i++){
-                meshIn->value.v.at(i).y += testIn->value;
-            }
-            /*
-            for(auto v : meshIn->value.v){
-                std::cout << "modifying y to:" << testIn->value << std::endl;
-                v.y = testIn->value;
-            }*/
-
-            // TESTING
-            /*
-            for(auto v : meshIn->value.v){
-                std::cout << "verifying that y is set to:" << v.y << std::endl;
-            }
             */
+
+            if(xformIn->connected()) {
+                field::Connection conn = xformIn->connections.at(0);
+                xformIn->value = static_cast<MatrixField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+            }
+
+            if(meshIn->connected()) {
+                field::Connection conn = meshIn->connections.at(0);
+                meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+            }
+
+            meshOut->value = meshIn->value;
+
+            // modify the mesh location based on the xform input
+            /*
+            std::cout << "BEFORE\n";
+            for(auto v : meshOut->value.v)
+                std::cout << "meshIn.x = " << v.x << " meshIn.y = " << v.y << " meshIn.z = " << v.z << std::endl;
+            */
+            tools::apply_matrix_to_mesh(&xformIn->value,meshOut->value);
+            /*
+            std::cout << "AFTER\n";
+            for(auto v : meshOut->value.v)
+                std::cout << "meshIn.x = " << v.x << " meshIn.y = " << v.y << " meshIn.z = " << v.z << std::endl;
+            */
+
         } else {
             std::cout << "test not set to update\n";
         }
@@ -124,7 +136,7 @@ namespace feather
     DRAW_IT(POLYGON_SHAPE)
     {
         std::cout << "POLYGON_SHAPE DRAW IT\n";
-        ADD_MESH(3)
+        ADD_MESH(5)
         return status();    
     };
 

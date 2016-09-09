@@ -28,6 +28,8 @@
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
 #include <feather/draw.hpp>
+#include <feather/tools.hpp>
+
 
 /*
  ***************************************
@@ -427,55 +429,75 @@ ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,9)
 ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,10)
 // sZ 
 ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,11)
-// LOCAL POSITION OUT
-// tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,12)
-// tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,13)
-// tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,14)
-// rX
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,15)
-// rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,16)
-// rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,17)
-// sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,18)
-// sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,19)
-// sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,20)
-// WORLD POSITION OUT 
-// tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,21)
-// tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,22)
-// tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,23)
-// rX
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,24)
-// rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,25)
-// rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,0,26)
-// sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,27)
-// sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,28)
-// sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::Out,1,29)
-
+// OUT
+// local matrix
+ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),12)
+// world matrix
+ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),13)
 
 namespace feather
 {
     DO_IT(TRANSFORM) 
     {
-        //TransformFields* xform = static_cast<TransformFields*>(fields);
-        //std::cout << "xform: tx:" << xform->tx << std::endl;
-        
-        // Take the input and generate world coords using the parent node position
+        // build local matrix based off of field inputs
+        typedef field::Field<FReal>*  RealField;
+        typedef field::Field<FMatrix4x4>*  MatrixField;
 
+        RealField txIn;
+        RealField tyIn;
+        RealField tzIn;
+        RealField rxIn;
+        RealField ryIn;
+        RealField rzIn;
+        RealField sxIn;
+        RealField syIn;
+        RealField szIn;
+        MatrixField localMatrixOut;
+        MatrixField worldMatrixOut;
+
+        for(auto f : fields){
+            if(f->id==3)
+                txIn= static_cast<RealField>(f);
+            if(f->id==4)
+                tyIn= static_cast<RealField>(f);
+            if(f->id==5)
+                tzIn= static_cast<RealField>(f);
+            if(f->id==6)
+                rxIn= static_cast<RealField>(f);
+            if(f->id==7)
+                ryIn= static_cast<RealField>(f);
+            if(f->id==8)
+                rzIn= static_cast<RealField>(f);
+            if(f->id==9)
+                sxIn= static_cast<RealField>(f);
+            if(f->id==10)
+                syIn= static_cast<RealField>(f);
+            if(f->id==11)
+                szIn= static_cast<RealField>(f);
+            if(f->id==12)
+                localMatrixOut= static_cast<MatrixField>(f);
+            if(f->id==13)
+                worldMatrixOut= static_cast<MatrixField>(f);
+        }
+
+        FMatrix4x4 matrix;
+        tools::build_matrix(
+                txIn->value,
+                tyIn->value,
+                tzIn->value,
+                rxIn->value,
+                ryIn->value,
+                rzIn->value,
+                sxIn->value,
+                syIn->value,
+                szIn->value,
+                matrix
+                );
+
+        localMatrixOut->value = matrix;
+
+        // build world matrix based off of local added to parent's world matrix
+        
         return status();
     };
 } // namespace feather

@@ -174,6 +174,7 @@ feather::status io::file<io::IMPORT,io::OBJ>(obj_data_t& data, std::string filen
         int vcount = scene->mMeshes[i]->mNumVertices;
         //std::cout << "VCOUNT for " << obj.o << " = " << vcount << std::endl;
         for( int j=0; j < vcount; j++){
+            //std::cout << "IMPORTING x:" << scene->mMeshes[i]->mVertices[j][0] << " y:" << scene->mMeshes[i]->mVertices[j][1] << " z:" << scene->mMeshes[i]->mVertices[j][2] << std::endl;
             obj.mesh.v.push_back(feather::FVertex3D(scene->mMeshes[i]->mVertices[j][0], scene->mMeshes[i]->mVertices[j][1], scene->mMeshes[i]->mVertices[j][2]));
             obj.mesh.vn.push_back(feather::FVertex3D(scene->mMeshes[i]->mNormals[j][0], scene->mMeshes[i]->mNormals[j][1], scene->mMeshes[i]->mNormals[j][2]));
         }
@@ -201,7 +202,7 @@ feather::status io::file<io::IMPORT,io::OBJ>(obj_data_t& data, std::string filen
                 face.push_back(fp); 
             }
             sgroup.f.push_back(face);
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
         group_t group;
         group.sg.push_back(sgroup);
