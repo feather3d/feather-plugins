@@ -86,7 +86,7 @@ namespace feather
     DRAW_IT(EMPTY)
     {
         std::cout << "EMPTY DRAW IT\n";
-        ADD_LINE(FVertex3D(0.0,0.0,0.0),FVertex3D(2.0,2.0,2.0),FColorRGB(1.0,1.0,0.0),draw::Line::Solid)
+        //ADD_LINE(FVertex3D(0.0,0.0,0.0),FVertex3D(2.0,2.0,2.0),FColorRGB(1.0,1.0,0.0),draw::Line::Solid)
         return status();
     };
 

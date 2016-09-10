@@ -127,7 +127,7 @@ namespace feather
                     sourcefield sf=NULL;
 
                     // NOTE: you can't call feather::sg[uid] from here - you will get a seg fault 
-                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(uid,320,3,0));
+                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(uid,320,1,0));
                     if(sf){
                         // only going to do the first object as a test
                         // fill in the mesh
