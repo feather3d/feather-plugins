@@ -53,18 +53,12 @@ PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE
  *            POLYGON SHAPE            *
  ***************************************
 */
-
-// parent
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::Out,FNode(),2)
-
 // meshIn
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),3)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),1)
 // xformIn 
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMatrix4x4,field::Matrix4x4,field::connection::In,FMatrix4x4(),4)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMatrix4x4,field::Matrix4x4,field::connection::In,FMatrix4x4(),2)
 // xformIn 
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),3)
 
 namespace feather
 {
@@ -79,11 +73,11 @@ namespace feather
         MatrixField xformIn=0;
 
         for(auto f : fields){
-            if(f->id == 3)
+            if(f->id == 1)
                 meshIn = static_cast<MeshField>(f);
-            if(f->id == 4)
+            if(f->id == 2)
                 xformIn = static_cast<MatrixField>(f);
-            if(f->id == 5)
+            if(f->id == 3)
                 meshOut = static_cast<MeshField>(f);
          }
 
@@ -136,7 +130,7 @@ namespace feather
     DRAW_IT(POLYGON_SHAPE)
     {
         std::cout << "POLYGON_SHAPE DRAW IT\n";
-        ADD_MESH(5)
+        ADD_MESH(3)
         return status();    
     };
 
@@ -150,16 +144,12 @@ NODE_INIT(POLYGON_SHAPE,node::Shape,"polyshape.svg")
  *            POLYGON PLANE            *
  ***************************************
 */
-// parent
-ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(POLYGON_PLANE,FNode,field::Node,field::connection::Out,FNode(),2)
 // subX
-ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,3)
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,1)
 // subY
-ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,4)
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FInt,field::Int,field::connection::In,2,2)
 // meshOut
-ADD_FIELD_TO_NODE(POLYGON_PLANE,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
+ADD_FIELD_TO_NODE(POLYGON_PLANE,FMesh,field::Mesh,field::connection::Out,FMesh(),3)
 
 
 namespace feather
@@ -174,7 +164,7 @@ namespace feather
 
         MeshOut meshOut=nullptr;
         for(auto f : fields){
-            if(f->id == 5)
+            if(f->id == 3)
                 meshOut = static_cast<MeshOut>(f);
         }
         if(!meshOut) {
@@ -218,14 +208,14 @@ NODE_INIT(POLYGON_PLANE,node::Polygon,"polyplane.svg")
  *            POLYGON CUBE             *
  ***************************************
 */
-// parent
-ADD_FIELD_TO_NODE(POLYGON_CUBE,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(POLYGON_CUBE,FNode,field::Node,field::connection::Out,FNode(),2)
+// sub x
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,1)
+// sub y
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,2)
+// sub z
 ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,3)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,4)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,FInt,field::Int,field::connection::In,0,5)
-ADD_FIELD_TO_NODE(POLYGON_CUBE,FMesh,field::Mesh,field::connection::Out,FMesh(),6)
+// mesh out
+ADD_FIELD_TO_NODE(POLYGON_CUBE,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
 
 namespace feather
 {
@@ -240,13 +230,13 @@ namespace feather
         SubIn subY=0;
         SubIn subZ=0;
         for(auto f : fields){
-            if(f->id == 3)
+            if(f->id == 1)
                 subX = static_cast<SubIn>(f);
-            if(f->id == 4)
+            if(f->id == 2)
                 subY = static_cast<SubIn>(f);
-            if(f->id == 5)
+            if(f->id == 3)
                 subZ = static_cast<SubIn>(f);
-            if(f->id == 6)
+            if(f->id == 4)
                 meshOut = static_cast<MeshOut>(f);
         }
         if(!meshOut) {

@@ -56,18 +56,14 @@ PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATIO
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FNode,field::Node,field::connection::Out,FNode(),2)
 // time 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FReal,field::Real,field::connection::In,0.0,3)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FReal,field::Real,field::connection::In,0.0,1)
 // value
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,4)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,2)
 // in curve type 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,3)
 // out curve type 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,6)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEY,FInt,field::Int,field::connection::In,0,4)
 // add curve vectors
 
 namespace feather
@@ -99,18 +95,14 @@ NODE_INIT(ANIMATION_INT_KEY,node::Animation,"key.svg")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FNode,field::Node,field::connection::Out,FNode(),2)
 // time 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,3)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,1)
 // value
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,4)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FReal,field::Real,field::connection::In,0.0,2)
 // in curve type 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,3)
 // out curve type 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,6)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEY,FInt,field::Int,field::connection::In,0,4)
 // add curve vectors
 
 namespace feather
@@ -142,16 +134,13 @@ NODE_INIT(ANIMATION_REAL_KEY,node::Animation,"key.svg")
  *            ANIMATION INT TRACK      *
  ***************************************
 */
-// parent
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNode,field::Node,field::connection::Out,FNode(),2)
+
 // time 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FReal,field::Real,field::connection::In,0.0,3)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FReal,field::Real,field::connection::In,0.0,1)
 // keys 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),4)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),2)
 // value 
-ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FInt,field::Int,field::connection::Out,0.0,5)
+ADD_FIELD_TO_NODE(ANIMATION_INT_KEYTRACK,FInt,field::Int,field::connection::Out,0.0,3)
 
 namespace feather
 {
@@ -172,16 +161,13 @@ NODE_INIT(ANIMATION_INT_KEYTRACK,node::Animation,"track.svg")
  *            ANIMATION REAL TRACK     *
  ***************************************
 */
-// parent
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNode,field::Node,field::connection::Out,FNode(),2)
+
 // time 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::In,0.0,3)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::In,0.0,1)
 // keys 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),4)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),2)
 // value 
-ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,5)
+ADD_FIELD_TO_NODE(ANIMATION_REAL_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,3)
 
 namespace feather
 {
@@ -224,11 +210,11 @@ namespace feather
             // set the time of the key
             typedef field::Field<feather::FReal>* sourcefield;
             sourcefield sf=NULL;
-            sf = static_cast<sourcefield>(feather::plugin::get_node_field_base(uid,3));
+            sf = static_cast<sourcefield>(feather::plugin::get_node_field_base(uid,1));
             sf->value = time;
 
             // connect to the root for now
-            plugin::connect(0,2,uid,1);
+            plugin::connect(0,202,uid,201);
         
             // update scenegraph            
             plugin::update();

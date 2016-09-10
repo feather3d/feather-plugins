@@ -144,10 +144,10 @@ bool io::feather_format::save(std::string filename) {
 
     header.major = 0;
     header.minor = 1;
-    header.stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,7))->value;
-    header.etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,8))->value;
-    header.ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,9))->value;
-    header.fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,10))->value;
+    header.stime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,5))->value;
+    header.etime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,6))->value;
+    header.ctime = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,7))->value;
+    header.fps = static_cast<feather::field::Field<double>*>(plugin::get_field_base(time_uid,8))->value;
     header.nodecount = uids.size()-1; // we are not going to add the root node from the uid list
     file.write((char*)&header,sizeof(header));
 

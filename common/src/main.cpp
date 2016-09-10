@@ -74,11 +74,7 @@ PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,T
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(EMPTY,FNode,field::Node,field::connection::Out,FNode(),2)
-
+// No Fields
 
 namespace feather
 {
@@ -107,14 +103,10 @@ NODE_INIT(EMPTY,node::Empty,"node_empty.svg")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(CAMERA,FNode,field::Node,field::connection::Out,FNode(),2)
 // type 
-ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,1)
 // fov 
-ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,45.0,4)
+ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,45.0,2)
 
 namespace feather
 {
@@ -126,7 +118,7 @@ namespace feather
     DRAW_IT(CAMERA)
     {
         std::cout << "CAMERA DRAW IT\n";
-        ADD_PERSP_CAMERA(4)
+        ADD_PERSP_CAMERA(2)
         return status();
     };
 
@@ -142,12 +134,9 @@ NODE_INIT(CAMERA,node::Camera,"node_camera.svg")
  *               SHAPE                 *
  ***************************************
 */
-// parent
-ADD_FIELD_TO_NODE(SHAPE,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(SHAPE,FNode,field::Node,field::connection::Out,FNode(),2)
-ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),3)
-ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
+
+ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),1)
+ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),2)
 
 
 namespace feather
@@ -170,28 +159,24 @@ NODE_INIT(SHAPE,node::Object,"")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(TIME,FNode,field::Node,field::connection::Out,FNode(),2)
 // IN FIELDS
 // start time
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,1)
 // end time
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,10,4)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,10,2)
 // current time 
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,3)
 // fps
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,24,6)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,24,4)
 // OUT FIELDS
 // start time
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,7)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,5)
 // end time
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,8)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,6)
 // current time 
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,9)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,7)
 // fps
-ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,10)
+ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,8)
 
 namespace feather
 {
@@ -209,21 +194,21 @@ namespace feather
         DField fpsOut=0;
 
         for(auto f : fields){
-            if(f->id == 3)
+            if(f->id == 1)
                 stimeIn = static_cast<DField>(f);
-            if(f->id == 4)
+            if(f->id == 2)
                 etimeIn = static_cast<DField>(f);
-            if(f->id == 5)
+            if(f->id == 3)
                 cposIn = static_cast<DField>(f);
-            if(f->id == 6)
+            if(f->id == 4)
                 fpsIn = static_cast<DField>(f);
-            if(f->id == 7)
+            if(f->id == 5)
                 stimeOut = static_cast<DField>(f);
-            if(f->id == 8)
+            if(f->id == 6)
                 etimeOut = static_cast<DField>(f);
-            if(f->id == 9)
+            if(f->id == 7)
                 cposOut = static_cast<DField>(f);
-            if(f->id == 10)
+            if(f->id == 8)
                 fpsOut = static_cast<DField>(f);
         }
 
@@ -280,19 +265,15 @@ NODE_INIT(TIME,node::Time,"time.svg")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(MULTIPLY,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(MULTIPLY,FNode,field::Node,field::connection::Out,FNode(),2)
 // IN FIELDS
 // value 
-ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,0,1)
 // OUT FIELDS
 // multiplier 
-ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,1,4)
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::In,1,2)
 // OUT FIELDS
 // value 
-ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::Out,0,5)
+ADD_FIELD_TO_NODE(MULTIPLY,FReal,field::Real,field::connection::Out,0,3)
 
 namespace feather
 {
@@ -305,11 +286,11 @@ namespace feather
         DField valueOut=0;
 
         for(auto f : fields){
-            if(f->id == 3)
+            if(f->id == 1)
                 valueIn = static_cast<DField>(f);
-            if(f->id == 4)
+            if(f->id == 2)
                 multiplierIn = static_cast<DField>(f);
-            if(f->id == 5)
+            if(f->id == 3)
                 valueOut = static_cast<DField>(f);
         }
 
@@ -343,18 +324,14 @@ NODE_INIT(MULTIPLY,node::Tool,"multiply.svg")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(DIVIDE,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(DIVIDE,FNode,field::Node,field::connection::Out,FNode(),2)
 // IN FIELDS
 // value 
-ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,0,1)
 // divider 
-ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,1,4)
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::In,1,2)
 // OUT FIELDS
 // value 
-ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::Out,0,5)
+ADD_FIELD_TO_NODE(DIVIDE,FReal,field::Real,field::connection::Out,0,3)
 
 namespace feather
 {
@@ -367,11 +344,11 @@ namespace feather
         DField valueOut=0;
 
         for(auto f : fields){
-            if(f->id == 3)
+            if(f->id == 1)
                 valueIn = static_cast<DField>(f);
-            if(f->id == 4)
+            if(f->id == 2)
                 dividerIn = static_cast<DField>(f);
-            if(f->id == 5)
+            if(f->id == 3)
                 valueOut = static_cast<DField>(f);
         }
 
@@ -406,34 +383,30 @@ NODE_INIT(DIVIDE,node::Tool,"divide.svg")
  ***************************************
 */
 
-// parent
-ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::In,FNode(),1)
-// child
-ADD_FIELD_TO_NODE(TRANSFORM,FNode,field::Node,field::connection::Out,FNode(),2)
 // LOCAL POSITION IN
 // tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,3)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,1)
 // tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,4)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,2)
 // tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,5)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,3)
 // rX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,6)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,4)
 // rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,7)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,5)
 // rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,8)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,6)
 // sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,9)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,7)
 // sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,10)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,8)
 // sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,11)
+ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,9)
 // OUT
 // local matrix
-ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),12)
+ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),10)
 // world matrix
-ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),13)
+ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),11)
 
 namespace feather
 {
@@ -456,27 +429,27 @@ namespace feather
         MatrixField worldMatrixOut;
 
         for(auto f : fields){
-            if(f->id==3)
+            if(f->id==1)
                 txIn= static_cast<RealField>(f);
-            if(f->id==4)
+            if(f->id==2)
                 tyIn= static_cast<RealField>(f);
-            if(f->id==5)
+            if(f->id==3)
                 tzIn= static_cast<RealField>(f);
-            if(f->id==6)
+            if(f->id==4)
                 rxIn= static_cast<RealField>(f);
-            if(f->id==7)
+            if(f->id==5)
                 ryIn= static_cast<RealField>(f);
-            if(f->id==8)
+            if(f->id==6)
                 rzIn= static_cast<RealField>(f);
-            if(f->id==9)
+            if(f->id==7)
                 sxIn= static_cast<RealField>(f);
-            if(f->id==10)
+            if(f->id==8)
                 syIn= static_cast<RealField>(f);
-            if(f->id==11)
+            if(f->id==9)
                 szIn= static_cast<RealField>(f);
-            if(f->id==12)
+            if(f->id==10)
                 localMatrixOut= static_cast<MatrixField>(f);
-            if(f->id==13)
+            if(f->id==11)
                 worldMatrixOut= static_cast<MatrixField>(f);
         }
 

@@ -116,7 +116,7 @@ namespace feather
                     uid = feather::scenegraph::add_node(320,objdata.o,s);
                     std::cout << "mesh uid:" << uid << std::endl;
                     // for now I'm just going to connect the root to the node 
-                    feather::status p = feather::scenegraph::connect(0,2,uid,1);
+                    feather::status p = feather::scenegraph::connect(0,202,uid,201);
                     if(p.state==feather::FAILED)
                         std::cout << p.msg << std::endl;
 
