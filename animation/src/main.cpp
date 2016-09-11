@@ -30,6 +30,7 @@
 //#include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
 #include <feather/plugin.hpp>
+#include <feather/tools.hpp>
 #include <QColor>
 
 #ifdef __cplusplus

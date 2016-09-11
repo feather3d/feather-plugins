@@ -64,9 +64,8 @@ using namespace feather;
 #define TIME 4
 #define MULTIPLY 5
 #define DIVIDE 6
-#define TRANSFORM 7
 
-PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,TRANSFORM)
+PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,DIVIDE)
 
 /*
  ***************************************
@@ -374,109 +373,6 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(DIVIDE,node::Tool,"divide.svg")
-
-
-
-/*
- ***************************************
- *              TRANSFORM              *
- ***************************************
-*/
-
-// LOCAL POSITION IN
-// tX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,1)
-// tY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,2)
-// tZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,3)
-// rX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,4)
-// rY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,5)
-// rZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,0,6)
-// sX 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,7)
-// sY 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,8)
-// sZ 
-ADD_FIELD_TO_NODE(TRANSFORM,FReal,field::Real,field::connection::In,1,9)
-// OUT
-// local matrix
-ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),10)
-// world matrix
-ADD_FIELD_TO_NODE(TRANSFORM,FMatrix4x4,field::Matrix4x4,field::connection::Out,FMatrix4x4(),11)
-
-namespace feather
-{
-    DO_IT(TRANSFORM) 
-    {
-        // build local matrix based off of field inputs
-        typedef field::Field<FReal>*  RealField;
-        typedef field::Field<FMatrix4x4>*  MatrixField;
-
-        RealField txIn;
-        RealField tyIn;
-        RealField tzIn;
-        RealField rxIn;
-        RealField ryIn;
-        RealField rzIn;
-        RealField sxIn;
-        RealField syIn;
-        RealField szIn;
-        MatrixField localMatrixOut;
-        MatrixField worldMatrixOut;
-
-        for(auto f : fields){
-            if(f->id==1)
-                txIn= static_cast<RealField>(f);
-            if(f->id==2)
-                tyIn= static_cast<RealField>(f);
-            if(f->id==3)
-                tzIn= static_cast<RealField>(f);
-            if(f->id==4)
-                rxIn= static_cast<RealField>(f);
-            if(f->id==5)
-                ryIn= static_cast<RealField>(f);
-            if(f->id==6)
-                rzIn= static_cast<RealField>(f);
-            if(f->id==7)
-                sxIn= static_cast<RealField>(f);
-            if(f->id==8)
-                syIn= static_cast<RealField>(f);
-            if(f->id==9)
-                szIn= static_cast<RealField>(f);
-            if(f->id==10)
-                localMatrixOut= static_cast<MatrixField>(f);
-            if(f->id==11)
-                worldMatrixOut= static_cast<MatrixField>(f);
-        }
-
-        FMatrix4x4 matrix;
-        tools::build_matrix(
-                txIn->value,
-                tyIn->value,
-                tzIn->value,
-                rxIn->value,
-                ryIn->value,
-                rzIn->value,
-                sxIn->value,
-                syIn->value,
-                szIn->value,
-                matrix
-                );
-
-        localMatrixOut->value = matrix;
-
-        // build world matrix based off of local added to parent's world matrix
-        
-        return status();
-    };
-} // namespace feather
-
-NODE_INIT(TRANSFORM,node::Manipulator,"transform.svg")
-
 
 
 /*

@@ -29,6 +29,7 @@
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
 #include <feather/scenegraph.hpp>
+#include <feather/tools.hpp>
 
 #include "io.hpp"
 #include "feather.hpp"
