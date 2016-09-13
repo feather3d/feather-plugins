@@ -102,10 +102,16 @@ NODE_INIT(EMPTY,node::Empty,"node_empty.svg")
  ***************************************
 */
 
-// type 
+// type
+// 0 = Perspective
+// 1 = Orthographic 
 ADD_FIELD_TO_NODE(CAMERA,FInt,field::Int,field::connection::In,0,1)
 // fov 
 ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,45.0,2)
+// near plane 
+ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,0.1,3)
+// far plane 
+ADD_FIELD_TO_NODE(CAMERA,FReal,field::Real,field::connection::In,100.0,4)
 
 namespace feather
 {
@@ -117,7 +123,7 @@ namespace feather
     DRAW_IT(CAMERA)
     {
         std::cout << "CAMERA DRAW IT\n";
-        ADD_PERSP_CAMERA(2)
+        ADD_PERSP_CAMERA(1,2,3,4)
         return status();
     };
 
