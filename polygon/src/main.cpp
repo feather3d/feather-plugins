@@ -30,6 +30,7 @@
 #include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
 #include <feather/tools.hpp>
+#include <feather/plugin.hpp>
 #include <QColor>
 
 #ifdef __cplusplus
@@ -83,6 +84,7 @@ namespace feather
 
         if(xformIn->update || meshIn->update)
         {
+            std::cout << "POLYGON SHAPE UPDATE\n";
             /* 
             std::cout << "SHAPE testIn ATTRIBUTES:\n"
                 << "fid:" << testIn->id << std::endl
@@ -106,18 +108,17 @@ namespace feather
             }
 
             meshOut->value = meshIn->value;
-
             // modify the mesh location based on the xform input
             //std::cout << "BEFORE\n";
             //for(auto v : meshOut->value.v)
-            //    std::cout << "meshIn.x = " << v.x << " meshIn.y = " << v.y << " meshIn.z = " << v.z << std::endl;
+            //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
             tools::apply_matrix_to_mesh(&xformIn->value,meshOut->value);
             //std::cout << "AFTER\n";
             //for(auto v : meshOut->value.v)
-            //    std::cout << "meshIn.x = " << v.x << " meshIn.y = " << v.y << " meshIn.z = " << v.z << std::endl;
-
+            //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
+            meshOut->update = true;
         } else {
-            std::cout << "test not set to update\n";
+            std::cout << "POLYGON SHAPE not set to update\n";
         }
 
         return status();

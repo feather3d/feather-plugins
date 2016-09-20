@@ -30,6 +30,7 @@
 #include <feather/command.hpp>
 #include <feather/scenegraph.hpp>
 #include <feather/tools.hpp>
+#include <feather/plugin.hpp>
 
 #include "io.hpp"
 #include "feather.hpp"
@@ -57,7 +58,7 @@ namespace feather
 {
     namespace command
     {
-        enum Command { N=0, OPEN_FEATHER, SAVE_FEATHER, IMPORT_OBJ, EXPORT_OBJ };
+        enum Command { N=0, OPEN_FEATHER, SAVE_FEATHER, IMPORT_OBJ, EXPORT_OBJ, EXPORT_PLY };
 
         // open feather file
         status open_feather(parameter::ParameterList params) {
@@ -155,6 +156,39 @@ namespace feather
             return status();
         };
 
+        // export obj file
+        status export_ply(parameter::ParameterList params) {
+            std::cout << "running export_ply command" << std::endl;
+
+            std::string path;
+            bool selection;
+
+            bool p = params.getParameterValue<std::string>("path",path);
+            if(!p)
+                return status(FAILED,"path parameter failed");
+ 
+            p = params.getParameterValue<bool>("selection",selection);
+            if(!p)
+                return status(FAILED,"selection parameter failed");
+
+            std::vector<unsigned int> uids = plugin::get_selected_nodes();
+            std::cout << "There are " << uids.size() << " nodes selected\n";
+            status pass;
+            for(auto uid : uids){
+                std::cout << "uid:" << uid << " type:" << plugin::get_node_id(uid,pass) << std::endl;
+                // for now we are only going to export the mesh out from the shape node
+                if(plugin::get_node_id(uid,pass)==320){
+                    typedef field::Field<FMesh>* MeshType;
+                    MeshType mesh = static_cast<MeshType>(plugin::get_node_field_base(uid,3));
+                    std::string name;
+                    status p;
+                    plugin::get_node_name(uid,name,p);
+                    io::write_ply(path,name,&mesh->value); 
+                }
+            }
+            return status();
+        };
+
     } // namespace command
 
 } // namespace feather
@@ -179,4 +213,14 @@ ADD_PARAMETER(command::IMPORT_OBJ,2,parameter::Bool,"selection")
 // Export Obj Command
 ADD_COMMAND("export_obj",EXPORT_OBJ,export_obj)
 
-INIT_COMMAND_CALLS(EXPORT_OBJ)
+// Export Ply Command
+ADD_COMMAND("export_ply",EXPORT_PLY,export_ply)
+
+ADD_PARAMETER(command::EXPORT_PLY,1,parameter::String,"path")
+
+ADD_PARAMETER(command::EXPORT_PLY,2,parameter::Bool,"selection")
+
+
+INIT_COMMAND_CALLS(EXPORT_PLY)
+
+

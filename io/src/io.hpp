@@ -66,6 +66,7 @@ typedef struct {
 
     namespace io
     {
+
         enum FileType { Mesh, Shader, Group, Texture, Light, Camera, Global };
         enum Action { IMPORT, EXPORT };
         enum Format { OBJ, PLY };
@@ -73,7 +74,8 @@ typedef struct {
         bool load_mesh(mesh_t& mesh, std::string path);
         bool write_mesh(obj_data_t& data);
         bool write_obj(std::string filename, obj_data_t& data);
-
+        bool write_ply(std::string filename, std::string name, feather::FMesh* meshes);
+        void printAssimp(aiScene* scene);
 
         template <int Action, int Format>
         feather::status file(obj_data_t& data, std::string filename="") { return feather::status(feather::FAILED,"unknown action or format"); };

@@ -29,7 +29,7 @@
 #include <feather/command.hpp>
 #include <feather/draw.hpp>
 #include <feather/tools.hpp>
-
+#include <feather/plugin.hpp>
 
 /*
  ***************************************

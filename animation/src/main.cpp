@@ -136,7 +136,10 @@ namespace feather
         // TODO - I need to find a way to automate this so the plugin dev doesn't miss this step, maybe put this in the update process before the doit()
         if(time->connections.size())
             time->value = static_cast<RealField>(plugin::get_node_field_base(time->connections.at(0).puid,time->connections.at(0).pfid))->value;
-
+        // do the same for the value
+        if(value->connections.size())
+            value->value = static_cast<RealField>(plugin::get_node_field_base(value->connections.at(0).puid,value->connections.at(0).pfid))->value;
+ 
 
         // these are the key values from before and after the input time
         // TODO - currently we're only doing linear calculations

@@ -143,6 +143,182 @@ bool io::write_obj(std::string filename, obj_data_t& data)
 }
 
 
+bool io::write_ply(std::string path, std::string name, feather::FMesh* mesh)
+{
+    std::fstream file;
+    std::stringstream filepath;
+    filepath << path << name << ".ply";
+    file.open(filepath.str().c_str(),std::ios::out|std::ios::binary);
+
+    std::stringstream ss;
+    std::stringstream sv;
+    std::stringstream sf;
+
+    unsigned int cfp = 0;
+    for(auto f : mesh->f){
+        unsigned int fpcount = 0;
+            for(auto fp : f){
+                sv << mesh->v.at(fp.v).x << " " 
+                    << mesh->v.at(fp.v).y << " " 
+                    << mesh->v.at(fp.v).z << " " 
+                    ;
+                if(mesh->vn.size()){
+                    sv << mesh->vn.at(fp.vn).x << " " 
+                        << mesh->vn.at(fp.vn).y << " " 
+                        << mesh->vn.at(fp.vn).z << " "
+                        ; 
+                }
+
+                if(mesh->st.size()){
+                    sv << mesh->st.at(fp.vt).s << " " 
+                        << mesh->st.at(fp.vt).t
+                        ;
+                } 
+
+                sv << std::endl;
+                ++fpcount;
+            }
+        sf << fpcount;
+        for(unsigned int i=0; i < fpcount; i++){
+            sf << " " << cfp;
+            ++cfp;
+        }
+        sf << std::endl;
+    }
+
+    // write file
+    ss << "ply\n"
+        << "format ascii 1.0\n"
+        << "comment Created by Feather3D\n"
+        << "element vertex " << cfp << std::endl
+        << "property float x\n"
+        << "property float y\n"
+        << "property float z\n"
+        ;
+
+    if(mesh->vn.size()){
+        ss << "property float nx\n"
+            << "property float ny\n"
+            << "property float nz\n"
+            ;
+    }
+
+    if(mesh->st.size()){
+        ss << "property float s\n"
+            << "property float t\n"
+            ;
+    }
+
+    ss << "element face " << mesh->f.size() << std::endl
+        << "property list uchar uint vertex_indices\n"
+        << "end_header\n"
+        << sv.str()
+        << sf.str()
+        ; 
+
+    file.write(ss.str().c_str(),ss.tellp());
+    ss.seekp(0);
+    file.close();
+
+    return true;
+
+    // Had originally tryed using assimp to export the data but it kept seq faulting
+    // and didn't work correctly, so I just decided to do it manually since it's
+    // easier and probably faster
+
+    // EXPORT FORMAT's
+    /*
+       Export Format Id's
+       [0]: dae - COLLADA - Digital Asset Exchange Schema
+       [1]: x - X Files
+       [2]: stp - Step Files
+       [3]: obj - Wavefront OBJ format
+       [4]: stl - Stereolithography
+       [5]: stl - Stereolithography (binary)
+       [6]: ply - Stanford Polygon Library
+       [7]: ply - Stanford Polygon Library (binary)
+       [8]: 3ds - Autodesk 3DS (legacy)
+       [9]: assbin - Assimp Binary
+       [10]: assxml - Assxml Document
+    */
+
+    /*
+    Assimp::Exporter exporter;
+    const aiExportFormatDesc* format = exporter.GetExportFormatDescription(6);
+
+    aiScene mscene;
+    mscene.mFlags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType;
+    mscene.mRootNode = new aiNode(name.c_str());
+    aiMesh* nodeMeshes[1];
+    mscene.mMeshes = nodeMeshes;
+    aiMesh* nodeMesh = new aiMesh();
+    mscene.mNumMeshes = 1;
+    mscene.mMeshes[0] = nodeMesh;
+    mscene.mNumMaterials = 1;
+    mscene.mRootNode->mNumMeshes = 1;
+    unsigned int meshes[1] = {1};
+    mscene.mRootNode->mMeshes = meshes;
+    mscene.mMaterials = new aiMaterial*[1];
+    mscene.mMaterials[0] = nullptr;
+    mscene.mMaterials[0] = new aiMaterial();
+
+    // build Mesh
+    nodeMesh->mName = name.c_str();
+    nodeMesh->mNumVertices = mesh->v.size();
+    aiVector3D vertex[mesh->v.size()];
+    nodeMesh->mVertices = vertex;
+    int i=0;
+    for(auto v : mesh->v){
+        std::cout << "vertex count:" << mesh->v.size() << std::endl;
+        std::cout << "loading vertex x:" << v.x << " y:" << v.y << " z:" << v.z << std::endl;
+        nodeMesh->mVertices[i] = aiVector3t<float>(v.x,v.y,v.z);
+        i++;
+    }
+    std::cout << "applied vertex data\n";
+    // go through each face and extract it's vertex, normal and st data
+    i=0;
+    nodeMesh->mNumFaces = mesh->f.size();
+    aiFace faces[mesh->f.size()];
+    nodeMesh->mFaces = faces;
+    for(auto face : mesh->f){
+        nodeMesh->mFaces[i].mNumIndices = face.size();
+        unsigned int indices[face.size()];
+        nodeMesh->mFaces[i].mIndices = indices;
+        int j=0;
+        for(auto fp : face){
+            nodeMesh->mFaces[i].mIndices[j] = fp.v;
+            j++;
+        }
+        i++;
+    }
+    std::cout << "faces loaded\n";
+    std::cout << "exporting mesh" << std::endl;
+    printAssimp(&mscene);
+
+    std::stringstream file;
+    file << path << name << ".ply"; //filename << name << ".ply";
+    std::cout << "exporting " << file.str() << std::endl;
+    exporter.Export(&mscene,format->id,file.str().c_str(),mscene.mFlags);
+    */
+ 
+}
+
+void io::printAssimp(aiScene* scene)
+{
+    std::cout << "ASSIMP SCENE CONTENTS\n=====START=====\n";
+    std::cout << "root mesh count:" << scene->mNumMeshes << std::endl;
+    for(int i=0; i < scene->mNumMeshes; i++){
+        std::cout << "MESH DATA\n";
+        std::cout << "v count:" << scene->mMeshes[i]->mNumVertices << std::endl;
+        std::cout << "f count:" << scene->mMeshes[i]->mNumFaces << std::endl;
+        for(int j=0; j < scene->mMeshes[i]->mNumFaces; j++){
+            std::cout << "\ti count:" << scene->mMeshes[i]->mFaces[j].mNumIndices << std::endl;
+        }
+    }
+    std::cout << "=====END=====\n";
+}
+
+
 template <>
 feather::status io::file<io::IMPORT,io::OBJ>(obj_data_t& data, std::string filename)
 {
