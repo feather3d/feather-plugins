@@ -140,6 +140,10 @@ bool io::write_camera_data(std::string filename, unsigned int uid)
         << std::endl
         ;
 
+    // write header
+    ss << "1.0\n";
+    ss << stime << "," << etime << "," << fpsOut->value << "\n";
+
     while ( cpos >= stime && cpos <= etime){
         cposIn->value = cpos;
         cposIn->update = true; // sg values will not update without this
