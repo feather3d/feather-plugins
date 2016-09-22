@@ -58,7 +58,7 @@ namespace feather
 {
     namespace command
     {
-        enum Command { N=0, OPEN_FEATHER, SAVE_FEATHER, IMPORT_OBJ, EXPORT_OBJ, EXPORT_PLY };
+        enum Command { N=0, OPEN_FEATHER, SAVE_FEATHER, IMPORT_OBJ, EXPORT_CAMERA_DATA, EXPORT_OBJ, EXPORT_PLY };
 
         // open feather file
         status open_feather(parameter::ParameterList params) {
@@ -150,6 +150,26 @@ namespace feather
             return s;
         };
 
+        // export camera data file
+        status export_camera_data(parameter::ParameterList params) {
+            std::cout << "running export_camera_data command" << std::endl;
+
+            std::string path;
+            unsigned int uid;
+
+            bool p = params.getParameterValue<std::string>("path",path);
+            if(!p)
+                return status(FAILED,"path parameter failed");
+
+            p = params.getParameterValue<unsigned int>("uid",uid);
+            if(!p)
+                return status(FAILED,"uid parameter failed");
+
+            io::write_camera_data(path,uid); 
+ 
+            return status();
+        };
+
         // export obj file
         status export_obj(parameter::ParameterList params) {
             std::cout << "running export_obj command" << std::endl;
@@ -209,6 +229,13 @@ ADD_COMMAND("import_obj",IMPORT_OBJ,import_obj)
 ADD_PARAMETER(command::IMPORT_OBJ,1,parameter::String,"filename")
 
 ADD_PARAMETER(command::IMPORT_OBJ,2,parameter::Bool,"selection")
+
+// Export Camera Data Command
+ADD_COMMAND("export_camera_data",EXPORT_CAMERA_DATA,export_camera_data)
+
+ADD_PARAMETER(command::EXPORT_CAMERA_DATA,1,parameter::String,"path")
+
+ADD_PARAMETER(command::EXPORT_CAMERA_DATA,2,parameter::Int,"uid")
 
 // Export Obj Command
 ADD_COMMAND("export_obj",EXPORT_OBJ,export_obj)

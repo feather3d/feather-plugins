@@ -73,6 +73,7 @@ typedef struct {
 
         bool load_mesh(mesh_t& mesh, std::string path);
         bool write_mesh(obj_data_t& data);
+        bool write_camera_data(std::string filename, unsigned int uid);
         bool write_obj(std::string filename, obj_data_t& data);
         bool write_ply(std::string filename, std::string name, feather::FMesh* meshes);
         void printAssimp(aiScene* scene);

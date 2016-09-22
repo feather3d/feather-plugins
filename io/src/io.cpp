@@ -22,6 +22,7 @@
  ***********************************************************************/
 
 #include "io.hpp"
+#include <feather/plugin.hpp>
 
 bool io::load_mesh(mesh_t& mesh, std::string path)
 {
@@ -98,6 +99,86 @@ bool io::write_mesh(obj_data_t& data)
     return true;
 }
 
+bool io::write_camera_data(std::string filename, unsigned int uid)
+{
+    std::fstream file;
+    file.open(filename.c_str(),std::ios::out|std::ios::binary);
+
+    std::stringstream ss;
+
+    // get all the fields from the time node
+    typedef feather::field::Field<feather::FReal>* pReal;
+
+    // TIME NODE FIELDS
+    pReal stimeOut = static_cast<pReal>(feather::plugin::get_node_field_base(1,5));
+    pReal etimeOut = static_cast<pReal>(feather::plugin::get_node_field_base(1,6));
+    pReal fpsOut = static_cast<pReal>(feather::plugin::get_node_field_base(1,8));
+    pReal cposIn = static_cast<pReal>(feather::plugin::get_node_field_base(1,3));
+    
+    // CAMERA NODE FIELDS
+    pReal txOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,214));
+    pReal tyOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,215));
+    pReal tzOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,216));
+    pReal rxOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,217));
+    pReal ryOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,218));
+    pReal rzOut = static_cast<pReal>(feather::plugin::get_node_field_base(uid,219));
+    pReal fovIn = static_cast<pReal>(feather::plugin::get_node_field_base(uid,2));
+    pReal nearIn = static_cast<pReal>(feather::plugin::get_node_field_base(uid,3));
+    pReal farIn = static_cast<pReal>(feather::plugin::get_node_field_base(uid,4));
+ 
+    feather::FReal stime = stimeOut->value;
+    feather::FReal etime = etimeOut->value;
+    feather::FReal cpos = stime;
+    feather::FReal framestep = 1.0/fpsOut->value;
+
+    std::cout
+        << "Exporting camera data for stime " << stime
+        << " to etime " << etime
+        << " cpos "  << cpos
+        << " fps=" << fpsOut->value
+        << " framestep=" << framestep
+        << std::endl
+        ;
+
+    while ( cpos >= stime && cpos <= etime){
+        cposIn->value = cpos;
+        cposIn->update = true; // sg values will not update without this
+        feather::plugin::update();
+        std::cout
+            << "EXPORTING CAMERA DATA - uid:" << uid
+            << " cpos:" << cpos
+            << " tx:" << txOut->value
+            << " ty:" << tyOut->value
+            << " tz:" << tzOut->value
+            << std::endl
+            ;
+
+        ss << cpos 
+            << "," << txOut->value
+            << "," << tyOut->value
+            << "," << tzOut->value
+            << "," << rxOut->value
+            << "," << ryOut->value
+            << "," << rzOut->value
+            << "," << fovIn->value
+            << "," << nearIn->value
+            << "," << farIn->value
+            << "\n"
+            ;
+
+        cpos += framestep;   
+    } 
+
+
+    // reset to start frame and write data for each frame
+
+
+    file.write(ss.str().c_str(),ss.tellp());
+    //ss.seekp(0);
+    file.close();
+
+    return true;
+}
 
 bool io::write_obj(std::string filename, obj_data_t& data)
 {
