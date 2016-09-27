@@ -364,11 +364,12 @@ namespace feather
             subX->update = false;
             subY->update = false;
             subZ->update = false;
+            meshOut->update=true;
         }
 
         // testing split
         //meshOut->value.split_face(2,5,7);
-
+ 
         return status();
     };
 

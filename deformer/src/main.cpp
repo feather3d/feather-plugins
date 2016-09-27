@@ -56,14 +56,14 @@ PLUGIN_INIT("Deformer","Deformer nodes and commands","Richard Layman",CLUSTER,CL
 
 // IN
 // mesh 
-ADD_FIELD_TO_NODE(CLUSTER,FMesh,field::Real,field::connection::In,FMesh(),1)
+ADD_FIELD_TO_NODE(CLUSTER,FMesh,field::Mesh,field::connection::In,FMesh(),1)
 // ids 
 ADD_FIELD_TO_NODE(CLUSTER,FIntArray,field::IntArray,field::connection::In,std::vector<FInt>(),2)
 // weights 
 ADD_FIELD_TO_NODE(CLUSTER,FRealArray,field::RealArray,field::connection::In,std::vector<FReal>(),3)
 // OUT
 // mesh 
-ADD_FIELD_TO_NODE(CLUSTER,FMesh,field::Real,field::connection::Out,FMesh(),4)
+ADD_FIELD_TO_NODE(CLUSTER,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
 
 namespace feather
 {
@@ -94,47 +94,55 @@ namespace feather
                 localMatrixOut = static_cast<MatrixField>(f);
          }
 
-        if(meshIn->update || idsIn->update || weightsIn->update)
+        // get mesh in
+        if(meshIn->connected()) {
+            field::Connection conn = meshIn->connections.at(0);
+            meshIn->value = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
+        } else {
+            // since this is a cluster, we won't bother going any further
+            meshIn->update=false;
+            idsIn->update=false;
+            weightsIn->update=false;
+            meshOut->update=false;
+            return status();
+        }
+
+        // get ids
+        if(idsIn->connected()) {
+            field::Connection conn = idsIn->connections.at(0);
+            idsIn->value = static_cast<IntArrayField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        // if there are no id's, there's no need to do any calculations; apply mesh and get out
+        if(!idsIn->value.size()){
+            meshOut->value = meshIn->value;
+            meshIn->update=false;
+            idsIn->update=false;
+            weightsIn->update=false;
+            meshOut->update=true;
+            return status();
+        }
+
+        if(weightsIn->connected()) {
+            field::Connection conn = weightsIn->connections.at(0);
+            weightsIn->value = static_cast<RealArrayField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        //if(meshIn->update || idsIn->update || weightsIn->update)
+        if(true)
         {
             std::cout << "CLUSTER UPDATE\n";
 
-            if(meshIn->connected()) {
-                field::Connection conn = meshIn->connections.at(0);
-                meshIn->value = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
-            } else {
-                // since this is a cluster, we won't bother going any further
-                meshIn->update=false;
-                idsIn->update=false;
-                weightsIn->update=false;
-                meshOut->update=false;
-            }
-
-            if(idsIn->connected()) {
-                field::Connection conn = idsIn->connections.at(0);
-                idsIn->value = static_cast<IntArrayField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
-            }
-
-
-            // if there are no id's, there's no need to do any calculations; apply mesh and get out
-            if(!idsIn->value.size()){
-                meshOut->value = meshIn->value;
-                meshIn->update=false;
-                idsIn->update=false;
-                weightsIn->update=false;
-                meshOut->update=true;
-                return status();
-            }
+            std::cout << "mesh update=" << meshIn->update
+                << " ids update=" << idsIn->update
+                << " weights update=" << weightsIn->update
+                ;
 
 
             // Weight Rules
             // If the weights array only has one value, we'll use that values for all.
             // If the weights array size doesn't match the id's size, we'll use 1.0
             // If there are no weights, we'll use 1.0
-
-            if(weightsIn->connected()) {
-                field::Connection conn = weightsIn->connections.at(0);
-                weightsIn->value = static_cast<RealArrayField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
-            }
 
             // our first check will be for no weights
             if(!weightsIn->value.size() || weightsIn->value.size() != idsIn->value.size()) {
@@ -190,13 +198,22 @@ namespace feather
         // TODO - need to finish this once component selection is possible
         // add key
         status add_cluster(parameter::ParameterList params) {
-            /*
+            // for now we'll make it so that every vertex is bound to the cluster
+            status p;
+            unsigned int uid = plugin::add_node(CLUSTER,"cluster0",p);
+            // our first tests will be with cubes, so we'll add 3 ids leaving 1 not bound
+            typedef field::Field<FIntArray>* intarray;
+            intarray ids = static_cast<intarray>(plugin::get_field_base(uid,2));
+            ids->value.push_back(0);
+            ids->value.push_back(1);
+            ids->value.push_back(2);
+
             // connect to the root for now
             plugin::connect(0,202,uid,201);
         
             // update scenegraph            
             plugin::update();
-            */ 
+
             return status();
         };
 
