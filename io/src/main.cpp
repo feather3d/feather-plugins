@@ -83,6 +83,39 @@ namespace feather
             return status();
         };
 
+        // this is used to tracking down import issues, will delete later
+        void print_data(obj_data_t& data) {
+            for_each(data.object.begin(), data.object.end(), [] (object_t& objdata) {
+                std::cout << "MESH " << objdata.o << " DATA\n";
+                std::cout << "V DATA\ncount:" << objdata.mesh.v.size() << std::endl;
+                for(auto v : objdata.mesh.v)
+                    std::cout << "\tx:" << v.x << " y:" << v.y << " z:" << v.z << std::endl; 
+                std::cout << "ST DATA\ncount:" << objdata.mesh.st.size() << std::endl;
+                for(auto st: objdata.mesh.st)
+                    std::cout << "\ts:" << st.s << " t:" << st.t << std::endl; 
+                std::cout << "VN DATA\ncount:" << objdata.mesh.vn.size() << std::endl;
+                for(auto vn : objdata.mesh.vn)
+                    std::cout << "\tx:" << vn.x << " y:" << vn.y << " z:" << vn.z << std::endl; 
+                // FACE DATA
+                std::cout << "FACE DATA\n" << objdata.grp.at(0).sg.at(0).f.size() << std::endl;
+                for(auto g : objdata.grp){
+                    std::cout << "\tGROUP DATA\n";
+                    for(auto sg : g.sg){
+                        std::cout << "\t\tSMOOTHING GROUP - count:" << sg.f.size() << std::endl;
+                        for(auto f : sg.f){
+                            std::cout << "INDEX COUNT: " << f.size() << " - ";
+                            for(auto fp : f) {
+                                std::cout << fp.v << "/" << fp.vt << "/" << fp.vn << " ";
+                            }
+                            std::cout << std::endl;
+                        }
+                    }
+                } 
+            }
+
+            );
+        };
+
         // import obj file
         status import_obj(parameter::ParameterList params) {
             feather::status s;
@@ -113,6 +146,8 @@ namespace feather
             unsigned int uid = 0;
             int vstep = 0;
 
+            //print_data(data);
+
             for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
                     uid = feather::scenegraph::add_node(320,objdata.o,s);
@@ -136,7 +171,17 @@ namespace feather
                         sf->value.assign_v(objdata.mesh.v);
                         sf->value.assign_st(objdata.mesh.st);
                         sf->value.assign_vn(objdata.mesh.vn);
-                        sf->value.assign_f(objdata.grp.at(0).sg.at(0).f);
+                        // assign all groups
+                        int i = 0;
+                        for(auto g : objdata.grp) {
+                            int j = 0;
+                            for(auto sg : g.sg) {
+                                //sf->value.assign_f(objdata.grp.at(i).sg.at(j).f);
+                                sf->value.f.insert(sf->value.f.end(),sg.f.begin(),sg.f.end());
+                                j++;
+                            }
+                            i++;
+                        }
                         vstep += objdata.mesh.v.size();
                     }
                     else
@@ -149,6 +194,7 @@ namespace feather
 
             return s;
         };
+
 
         // export camera data file
         status export_camera_data(parameter::ParameterList params) {
