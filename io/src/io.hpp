@@ -76,7 +76,6 @@ typedef struct {
         bool write_camera_data(std::string filename, unsigned int uid);
         bool write_obj(std::string filename, obj_data_t& data);
         bool write_ply(std::string filename, std::string name, feather::FMesh* meshes);
-        void printAssimp(aiScene* scene);
 
         template <int Action, int Format>
         feather::status file(obj_data_t& data, std::string filename="") { return feather::status(feather::FAILED,"unknown action or format"); };
