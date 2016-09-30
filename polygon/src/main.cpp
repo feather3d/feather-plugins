@@ -33,6 +33,8 @@
 #include <feather/plugin.hpp>
 #include <QColor>
 
+#include "subdiv.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,8 +48,10 @@ using namespace feather;
 #define POLYGON_SHAPE 320
 #define POLYGON_PLANE 321
 #define POLYGON_CUBE 322
+#define POLYGON_SUBDIV 323
 
-PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_CUBE)
+
+PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_SUBDIV)
 
 /*
  ***************************************
@@ -376,6 +380,88 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(POLYGON_CUBE,node::Polygon,"polycube.svg")
+
+
+/*
+ ***************************************
+ *            POLYGON SUBDIV           *
+ ***************************************
+*/
+// IN
+// mesh in 
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FMesh,field::Mesh,field::connection::In,FMesh(),1)
+// level 
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FInt,field::Int,field::connection::In,2,2)
+// edge weights
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FRealArray,field::RealArray,field::connection::In,std::vector<FReal>(),3)
+// OUT
+// mesh
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
+
+namespace feather
+{
+
+    DO_IT(POLYGON_SUBDIV) 
+    {
+        typedef field::Field<FMesh>* MeshField;
+        typedef field::Field<FRealArray>* RealArrayField;
+        typedef field::Field<FInt>* IntField;
+
+        MeshField  meshIn;
+        IntField levelIn;
+        RealArrayField weightsIn;
+        MeshField meshOut;
+
+        for(auto f : fields){
+            if(f->id == 1)
+                meshIn = static_cast<MeshField>(f);
+            if(f->id == 2)
+                levelIn = static_cast<IntField>(f);
+            if(f->id == 3)
+                weightsIn = static_cast<RealArrayField>(f);
+            if(f->id == 4)
+                meshOut = static_cast<MeshField>(f);
+        }
+
+        if(meshIn->connected()) {
+            field::Connection conn = meshIn->connections.at(0);
+            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        if(levelIn->connected()) {
+            field::Connection conn = levelIn->connections.at(0);
+            levelIn->value = static_cast<IntField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        if(weightsIn->connected()) {
+            field::Connection conn = weightsIn->connections.at(0);
+            weightsIn->value = static_cast<RealArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        if(meshIn->update || levelIn->update || weightsIn->update)
+        {
+            // if there is no input mesh, get out of here
+            if(!meshIn->value.v.size())
+                return status();
+
+            // clear the mesh
+            meshOut->value.v.clear();
+            meshOut->value.st.clear();
+            meshOut->value.vn.clear();
+            meshOut->value.f.clear();
+
+            subdiv::subdiv_mesh(levelIn->value,&meshIn->value,&meshOut->value);
+
+            meshOut->update = true;
+        }
+
+        return status();
+    };
+
+} // namespace feather
+
+NODE_INIT(POLYGON_SUBDIV,node::Polygon,"polysubdiv.svg")
+
 
 
 /*

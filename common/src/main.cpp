@@ -165,18 +165,18 @@ NODE_INIT(SHAPE,node::Object,"")
 */
 
 // IN FIELDS
-// start time
+// start time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,1)
-// end time
+// end time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,10,2)
 // current time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,0,3)
 // fps
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::In,24,4)
 // OUT FIELDS
-// start time
+// start time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,5)
-// end time
+// end time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,6)
 // current time 
 ADD_FIELD_TO_NODE(TIME,FReal,field::Real,field::connection::Out,0,7)

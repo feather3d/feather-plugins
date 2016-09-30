@@ -3,6 +3,7 @@ PROJECT(feather_polygon)
 FIND_PACKAGE(OpenGL REQUIRED)
 
 SET(feather_polygon_SRCS
+    subdiv.cpp
     main.cpp
 )
 
@@ -11,6 +12,8 @@ ADD_DEFINITIONS("-D GL_GLEXT_PROTOTYPES")
 ADD_LIBRARY(feather_polygon SHARED ${feather_polygon_SRCS})
 
 QT5_USE_MODULES(feather_polygon OpenGL)
+
+TARGET_LINK_LIBRARIES(feather_polygon "-losdCPU" "-losdGPU")
 
 SET_TARGET_PROPERTIES(feather_polygon
     PROPERTIES
