@@ -253,11 +253,11 @@ namespace feather
                 // for now we are only going to export the mesh out from the shape node
                 if(plugin::get_node_id(uid,pass)==320){
                     typedef field::Field<FMesh>* MeshType;
-                    MeshType mesh = static_cast<MeshType>(plugin::get_node_field_base(uid,3));
+                    MeshType mesh = static_cast<MeshType>(plugin::get_field_base(uid,3));
                     std::string name;
                     status p;
                     plugin::get_node_name(uid,name,p);
-                    io::write_ply(path,name,&mesh->value); 
+                    io::write_ply(path,name,&mesh->value);
                 }
             }
             return status();
