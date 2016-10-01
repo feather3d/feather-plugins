@@ -49,9 +49,10 @@ using namespace feather;
 #define POLYGON_PLANE 321
 #define POLYGON_CUBE 322
 #define POLYGON_SUBDIV 323
+#define POLYGON_MESH 324
 
 
-PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_SUBDIV)
+PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_MESH)
 
 /*
  ***************************************
@@ -461,6 +462,65 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(POLYGON_SUBDIV,node::Polygon,"polysubdiv.svg")
+
+
+/*
+ ***************************************
+ *            POLYGON MESH             *
+ ***************************************
+*/
+// IN
+// mesh in 
+ADD_FIELD_TO_NODE(POLYGON_MESH,FMesh,field::Mesh,field::connection::In,FMesh(),1)
+// OUT
+// mesh
+ADD_FIELD_TO_NODE(POLYGON_MESH,FMesh,field::Mesh,field::connection::Out,FMesh(),2)
+
+namespace feather
+{
+
+    DO_IT(POLYGON_MESH) 
+    {
+        typedef field::Field<FMesh>* MeshField;
+
+        MeshField  meshIn;
+        MeshField meshOut;
+
+        for(auto f : fields){
+            if(f->id == 1)
+                meshIn = static_cast<MeshField>(f);
+            if(f->id == 2)
+                meshOut = static_cast<MeshField>(f);
+        }
+
+        if(meshIn->connected()) {
+            field::Connection conn = meshIn->connections.at(0);
+            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+        if(meshIn->update)
+        {
+            // if there is no input mesh, get out of here
+            if(!meshIn->value.v.size())
+                return status();
+
+            // clear the mesh
+            meshOut->value.v.clear();
+            meshOut->value.st.clear();
+            meshOut->value.vn.clear();
+            meshOut->value.f.clear();
+
+            meshOut->value = meshIn->value;
+
+            meshOut->update = true;
+        }
+
+        return status();
+    };
+
+} // namespace feather
+
+NODE_INIT(POLYGON_MESH,node::Polygon,"polymesh.svg")
 
 
 

@@ -143,17 +143,21 @@ namespace feather
 
             // for each object in the data file, create a node
             // and connect it to the root for now
-            unsigned int uid = 0;
+            unsigned int meshuid = 0;
+            unsigned int shapeuid = 0;
             int vstep = 0;
 
             //print_data(data);
 
-            for_each(data.object.begin(), data.object.end(), [&uid,&vstep,&s] (object_t& objdata) {
+            for_each(data.object.begin(), data.object.end(), [&meshuid,&shapeuid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    uid = feather::scenegraph::add_node(320,objdata.o,s);
-                    std::cout << "mesh uid:" << uid << std::endl;
+                    meshuid = feather::scenegraph::add_node(324,objdata.o,s);
+                    std::stringstream shapename;
+                    shapename << objdata.o << "_shape";
+                    shapeuid = feather::scenegraph::add_node(320,shapename.str(),s);
+                    std::cout << "mesh uid:" << meshuid << std::endl;
                     // for now I'm just going to connect the root to the node 
-                    feather::status p = feather::scenegraph::connect(0,202,uid,201);
+                    feather::status p = feather::scenegraph::connect(0,202,meshuid,201);
                     if(p.state==feather::FAILED)
                         std::cout << p.msg << std::endl;
 
@@ -164,7 +168,7 @@ namespace feather
                     sourcefield sf=NULL;
 
                     // NOTE: you can't call feather::sg[uid] from here - you will get a seg fault 
-                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(uid,320,1,0));
+                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(meshuid,324,1,0));
                     if(sf){
                         // only going to do the first object as a test
                         // fill in the mesh
@@ -186,6 +190,10 @@ namespace feather
                     }
                     else
                         std::cout << "NULL SOURCE FIELD\n";
+
+                    // connect the mesh node to the shape node
+                    p = feather::scenegraph::connect(meshuid,202,shapeuid,201);
+                    p = feather::scenegraph::connect(meshuid,2,shapeuid,1);
 
                     //std::cout << "added " << uid << " to the uid_update state which is " << feather::cstate.uid_update.size() << std::endl;
                     
