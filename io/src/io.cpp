@@ -259,7 +259,7 @@ bool io::write_ply(std::string path, std::string name, feather::FMesh* mesh)
                         << mesh->st.at(fp.vt).t
                         ;
                 } 
-                else if(mesh->st.size()<=fp.vt){
+                else if(mesh->st.size()<=fp.vt && mesh->st.size() != 0){
                     sv << "0 0";
                 }
                 sv << std::endl;
