@@ -227,6 +227,40 @@ bool io::write_obj(std::string filename, obj_data_t& data)
     return true;
 }
 
+feather::status io::export_ply(std::string path, bool selected)
+{
+    feather::status p;
+    std::vector<unsigned int> uids;
+
+    if(selected){
+        // only export selected shapes
+        uids = feather::plugin::get_selected_nodes();
+    } else {
+        // export all polygon shape nodes
+        feather::plugin::get_nodes(uids);
+    }
+
+    for(auto uid : uids){
+        std::cout << "uid:" << uid << " type:" << feather::plugin::get_node_id(uid,p) << std::endl;
+        // for now we are only going to export the mesh out from the shape node
+        if(feather::plugin::get_node_id(uid,p)==320){
+            typedef feather::field::Field<feather::FMesh>* MeshType;
+            MeshType mesh = static_cast<MeshType>(feather::plugin::get_field_base(uid,3));
+            std::string name;
+            feather::plugin::get_node_name(uid,name,p);
+            std::cout << "exporting uid:" << uid << " name:" << name << " to path:" << path << std::endl;
+            bool pass = io::write_ply(path,name,&mesh->value);
+            if(!pass) {
+                std::stringstream ss;
+                ss << "Failed to export " << name << " to ply format.";
+                std::cout << ss.str() << std::endl;
+                return feather::status(feather::FAILED,ss.str().c_str());
+            }
+        }
+    }
+
+    return p;
+}
 
 bool io::write_ply(std::string path, std::string name, feather::FMesh* mesh)
 {

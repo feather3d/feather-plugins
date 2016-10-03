@@ -245,9 +245,10 @@ namespace feather
             if(!p)
                 return status(FAILED,"selection parameter failed");
 
-            std::vector<unsigned int> uids = plugin::get_selected_nodes();
-            std::cout << "There are " << uids.size() << " nodes selected\n";
-            status pass;
+            //std::vector<unsigned int> uids = plugin::get_selected_nodes();
+            //std::cout << "There are " << uids.size() << " nodes selected\n";
+            status pass = io::export_ply(path,selection);
+            /*
             for(auto uid : uids){
                 std::cout << "uid:" << uid << " type:" << plugin::get_node_id(uid,pass) << std::endl;
                 // for now we are only going to export the mesh out from the shape node
@@ -260,7 +261,8 @@ namespace feather
                     io::write_ply(path,name,&mesh->value);
                 }
             }
-            return status();
+            */
+            return pass;
         };
 
     } // namespace command
