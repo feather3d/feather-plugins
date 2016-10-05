@@ -81,7 +81,7 @@ namespace feather
     DRAW_IT(ANIMATION_KEY)
     {
         std::cout << "ANIMATION_KEY DRAW IT\n";
-        ADD_MESH(3)
+        ADD_SHADED_MESH(3)
         return status();    
     };
     */

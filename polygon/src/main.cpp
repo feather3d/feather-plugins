@@ -132,7 +132,7 @@ namespace feather
     DRAW_IT(POLYGON_SHAPE)
     {
         std::cout << "POLYGON_SHAPE DRAW IT\n";
-        ADD_MESH(3)
+        ADD_SHADED_MESH(3)
         return status();    
     };
 
@@ -475,6 +475,13 @@ namespace feather
         }
 
         return status();
+    };
+
+    DRAW_IT(POLYGON_SUBDIV)
+    {
+        std::cout << "POLYGON_SUBDIV DRAW IT\n";
+        ADD_COMPONENT_MESH(1)
+        return status();    
     };
 
 } // namespace feather
