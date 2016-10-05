@@ -181,39 +181,20 @@ bool io::feather_format::save(std::string filename) {
         node.linkcount=0;
         node.datacount=0;
 
-        // do a quick scan to get the link and data counts
-        for (unsigned int fid : fids) {
-            field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
-            if(srcfield->connected())
-                node.linkcount++;
-            else
-                node.datacount++;
-        }
-
-        // write the node info
-        file.write((char*)&node,sizeof(node_t));
-        file.write((char*)name.c_str(),node.namelength);
-
-        std::cout << "NODE NAME = [" << name << "], namelength=" << node.namelength << ", c_str() length=" << sizeof(name.c_str()) << std::endl;
-
-        std::cout << "NODE INFO FOR: " << name  << std::endl 
-            << "\tuid:" << node.uid << std::endl
-            << "\tnid:" << node.nid << std::endl
-            << "\tnamelength:" << node.namelength << std::endl
-            << "\tlinkcount:" << node.linkcount << std::endl
-            << "\tdatacount:" << node.datacount << std::endl;
-
         for (unsigned int fid : fids) {
             field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,fid);
             if(srcfield->connected()){
-                link_t link;
-                field::Connection conn = srcfield->connections.at(0);
-                link.suid = conn.puid;
-                link.sfid = conn.pfid;
-                link.tuid = uid;
-                link.tfid = fid;
-                links.push_back(link);
+                for(auto conn : srcfield->connections){
+                    link_t link;
+                    link.suid = conn.puid;
+                    link.sfid = conn.pfid;
+                    link.tuid = uid;
+                    link.tfid = fid;
+                    links.push_back(link);
+                    node.linkcount++;
+                };
             } else {
+                node.datacount++;
                 data_t fieldinfo;
                 fieldinfo.fid = fid;
                 fieldinfo.type = srcfield->type;
@@ -247,6 +228,18 @@ bool io::feather_format::save(std::string filename) {
 
         }
 
+        file.write((char*)&node,sizeof(node_t));
+        file.write((char*)name.c_str(),node.namelength);
+
+        std::cout << "NODE NAME = [" << name << "], namelength=" << node.namelength << ", c_str() length=" << sizeof(name.c_str()) << std::endl;
+
+        std::cout << "NODE INFO FOR: " << name  << std::endl 
+            << "\tuid:" << node.uid << std::endl
+            << "\tnid:" << node.nid << std::endl
+            << "\tnamelength:" << node.namelength << std::endl
+            << "\tlinkcount:" << node.linkcount << std::endl
+            << "\tdatacount:" << node.datacount << std::endl;
+ 
         for ( link_t link : links ) {
             field::FieldBase* srcfield = plugin::get_node_field_base(uid,node.nid,link.tfid);
             file.write((char*)&link,sizeof(link_t));
