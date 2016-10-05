@@ -25,6 +25,7 @@
 
 #include <feather/types.hpp>
 #include <opensubdiv/far/topologyDescriptor.h>
+#include <opensubdiv/far/topologyRefinerFactory.h>
 #include <opensubdiv/far/primvarRefiner.h>
 
 namespace subdiv
@@ -115,7 +116,11 @@ namespace subdiv
         };
 
 
-        void loadMesh(feather::FMesh* mesh);
+        void loadMesh(
+                feather::FMesh* mesh,
+                feather::FVertexIndiceGroupWeightArray *vertexWeights,
+                feather::FVertexIndiceGroupWeightArray *edgeWeights
+                );
 
         int GetNumVertices() const { return (int)verts.size()/3; }
 
@@ -231,7 +236,13 @@ namespace subdiv
         }
 
 
-    void subdiv_mesh(unsigned int maxlevel, feather::FMesh *meshIn, feather::FMesh *meshOut);
+    void subdiv_mesh(
+            unsigned int maxlevel,
+            feather::FMesh *meshIn,
+            feather::FMesh *meshOut,
+            feather::FVertexIndiceGroupWeightArray *vertexWeights,
+            feather::FVertexIndiceGroupWeightArray *edgeWeights
+            );
 
 } // namespace subdiv
 
@@ -325,7 +336,6 @@ namespace OpenSubdiv {
                 inline bool
                 TopologyRefinerFactory<subdiv::Shape>::assignComponentTags(
                         Far::TopologyRefiner & refiner, subdiv::Shape const & shape) {
-
 
                     for (int i=0; i<(int)shape.tags.size(); ++i) {
 

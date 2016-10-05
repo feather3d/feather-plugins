@@ -393,11 +393,13 @@ NODE_INIT(POLYGON_CUBE,node::Polygon,"polycube.svg")
 ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FMesh,field::Mesh,field::connection::In,FMesh(),1)
 // level 
 ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FInt,field::Int,field::connection::In,2,2)
+// vertex weights
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FVertexIndiceGroupWeightArray,field::VertexIndiceGroupWeightArray,field::connection::In,std::vector<FVertexIndiceGroupWeight>(),3)
 // edge weights
-ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FRealArray,field::RealArray,field::connection::In,std::vector<FReal>(),3)
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FVertexIndiceGroupWeightArray,field::VertexIndiceGroupWeightArray,field::connection::In,std::vector<FVertexIndiceGroupWeight>(),4)
 // OUT
 // mesh
-ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
+ADD_FIELD_TO_NODE(POLYGON_SUBDIV,FMesh,field::Mesh,field::connection::Out,FMesh(),5)
 
 namespace feather
 {
@@ -405,12 +407,14 @@ namespace feather
     DO_IT(POLYGON_SUBDIV) 
     {
         typedef field::Field<FMesh>* MeshField;
-        typedef field::Field<FRealArray>* RealArrayField;
         typedef field::Field<FInt>* IntField;
+        typedef field::Field<FVertexIndiceGroupWeightArray>* VertexIndiceGroupWeightArrayField;
+
 
         MeshField  meshIn;
         IntField levelIn;
-        RealArrayField weightsIn;
+        VertexIndiceGroupWeightArrayField vertexWeightsIn;
+        VertexIndiceGroupWeightArrayField edgeWeightsIn;
         MeshField meshOut;
 
         for(auto f : fields){
@@ -419,8 +423,10 @@ namespace feather
             if(f->id == 2)
                 levelIn = static_cast<IntField>(f);
             if(f->id == 3)
-                weightsIn = static_cast<RealArrayField>(f);
+                vertexWeightsIn = static_cast<VertexIndiceGroupWeightArrayField>(f);
             if(f->id == 4)
+                edgeWeightsIn = static_cast<VertexIndiceGroupWeightArrayField>(f);
+            if(f->id == 5)
                 meshOut = static_cast<MeshField>(f);
         }
 
@@ -434,12 +440,18 @@ namespace feather
             levelIn->value = static_cast<IntField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
         }
 
-        if(weightsIn->connected()) {
-            field::Connection conn = weightsIn->connections.at(0);
-            weightsIn->value = static_cast<RealArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        if(vertexWeightsIn->connected()) {
+            field::Connection conn = vertexWeightsIn->connections.at(0);
+            vertexWeightsIn->value = static_cast<VertexIndiceGroupWeightArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
         }
 
-        if(meshIn->update || levelIn->update || weightsIn->update)
+        if(edgeWeightsIn->connected()) {
+            field::Connection conn = edgeWeightsIn->connections.at(0);
+            edgeWeightsIn->value = static_cast<VertexIndiceGroupWeightArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+        }
+
+
+        if(meshIn->update || levelIn->update || vertexWeightsIn->update || edgeWeightsIn->update)
         {
             // if there is no input mesh, get out of here
             if(!meshIn->value.v.size())
@@ -451,7 +463,13 @@ namespace feather
             meshOut->value.vn.clear();
             meshOut->value.f.clear();
 
-            subdiv::subdiv_mesh(levelIn->value,&meshIn->value,&meshOut->value);
+            subdiv::subdiv_mesh(
+                    levelIn->value,
+                    &meshIn->value,
+                    &meshOut->value,
+                    &vertexWeightsIn->value,
+                    &edgeWeightsIn->value
+                    );
 
             meshOut->update = true;
         }

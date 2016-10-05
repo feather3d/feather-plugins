@@ -25,7 +25,11 @@
 
 using namespace feather;
 
-void subdiv::Shape::loadMesh(feather::FMesh* mesh)
+void subdiv::Shape::loadMesh(
+        feather::FMesh* mesh,
+        feather::FVertexIndiceGroupWeightArray* vertexWeights,
+        feather::FVertexIndiceGroupWeightArray* edgeWeights
+        )
 {
     for(auto v : mesh->v){
         verts.push_back(v.x);
@@ -42,6 +46,72 @@ void subdiv::Shape::loadMesh(feather::FMesh* mesh)
 
     nvertsPerFace = mesh->verts_per_face();
     faceverts = mesh->vert_indices_per_face();
+
+    // For now we'll use Chaikin as the default smoothing method but this will be adjustable in the future
+    tag *smoothmethod = new tag();
+    smoothmethod->name="creasemethod";
+    smoothmethod->stringargs.push_back("chaikin");
+    tags.push_back(smoothmethod);
+
+    // fill in weighted vertex
+    std::for_each(vertexWeights->begin(), vertexWeights->end(), [this] (feather::FVertexIndiceGroupWeight group){
+            tag *t = new tag();
+            t->name="corner";
+            for(auto v : group.v)
+                t->intargs.push_back(v);
+            t->floatargs.push_back(group.weight);
+            tags.push_back(t);
+            });
+
+    // fill in weighted vertex
+    std::for_each(edgeWeights->begin(), edgeWeights->end(), [this] (feather::FVertexIndiceGroupWeight group){
+            tag *t = new tag();
+            t->name="crease";
+            for(auto v : group.v)
+                t->intargs.push_back(v);
+            t->floatargs.push_back(group.weight);
+            tags.push_back(t);
+            });
+
+    // TESTING
+    /*
+    // crease testing
+    // method
+    tag *t0 = new tag();
+    t0->name="creasemethod";
+    t0->stringargs.push_back("chaikin");
+
+    // edge creases
+    // the two vertex must connect our there will be a seq fault
+    tag *t1 = new tag();
+    t1->name="crease";
+    t1->intargs.push_back(0);
+    t1->intargs.push_back(1);
+
+    t1->intargs.push_back(2);
+    t1->intargs.push_back(3);
+
+    t1->intargs.push_back(0);
+    t1->intargs.push_back(3);
+
+    t1->intargs.push_back(1);
+    t1->intargs.push_back(2);
+
+    t1->floatargs.push_back(weight);
+
+    // vertex crease
+    tag *t2 = new tag();
+    t2->name="corner";
+    t2->intargs.push_back(0);
+    t2->intargs.push_back(1);
+    t2->intargs.push_back(2);
+    t2->intargs.push_back(3);
+    t2->floatargs.push_back(weight);
+
+    tags.push_back(t0);
+    tags.push_back(t1);
+    tags.push_back(t2);
+    */
 }
 
 std::string subdiv::Shape::tag::genTag() const {
@@ -64,11 +134,17 @@ std::string subdiv::Shape::tag::genTag() const {
 }
 
 
-void subdiv::subdiv_mesh(unsigned int maxlevel, feather::FMesh *meshIn, feather::FMesh *meshOut)
+void subdiv::subdiv_mesh(
+        unsigned int maxlevel,
+        feather::FMesh *meshIn,
+        feather::FMesh *meshOut,
+        feather::FVertexIndiceGroupWeightArray *vertexWeights,
+        feather::FVertexIndiceGroupWeightArray *edgeWeights
+        )
 {
     Shape *shape = new Shape();
 
-    shape->loadMesh(meshIn);
+    shape->loadMesh(meshIn,vertexWeights,edgeWeights);
 
     // create Far mesh (topology)
     OpenSubdiv::Sdc::SchemeType sdctype = GetSdcType(*shape);
@@ -94,7 +170,6 @@ void subdiv::subdiv_mesh(unsigned int maxlevel, feather::FMesh *meshIn, feather:
         options.fullTopologyInLastLevel = true;
         refiner->RefineUniform(options);
     }
-
 
     // Allocate a buffer for vertex primvar data. The buffer length is set to
     // be the sum of all children vertices up to the highest level of refinement.
