@@ -406,50 +406,11 @@ namespace feather
 
     DO_IT(POLYGON_SUBDIV) 
     {
-        typedef field::Field<FMesh>* MeshField;
-        typedef field::Field<FInt>* IntField;
-        typedef field::Field<FVertexIndiceGroupWeightArray>* VertexIndiceGroupWeightArrayField;
-
-
-        MeshField  meshIn;
-        IntField levelIn;
-        VertexIndiceGroupWeightArrayField vertexWeightsIn;
-        VertexIndiceGroupWeightArrayField edgeWeightsIn;
-        MeshField meshOut;
-
-        for(auto f : fields){
-            if(f->id == 1)
-                meshIn = static_cast<MeshField>(f);
-            if(f->id == 2)
-                levelIn = static_cast<IntField>(f);
-            if(f->id == 3)
-                vertexWeightsIn = static_cast<VertexIndiceGroupWeightArrayField>(f);
-            if(f->id == 4)
-                edgeWeightsIn = static_cast<VertexIndiceGroupWeightArrayField>(f);
-            if(f->id == 5)
-                meshOut = static_cast<MeshField>(f);
-        }
-
-        if(meshIn->connected()) {
-            field::Connection conn = meshIn->connections.at(0);
-            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-        }
-
-        if(levelIn->connected()) {
-            field::Connection conn = levelIn->connections.at(0);
-            levelIn->value = static_cast<IntField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-        }
-
-        if(vertexWeightsIn->connected()) {
-            field::Connection conn = vertexWeightsIn->connections.at(0);
-            vertexWeightsIn->value = static_cast<VertexIndiceGroupWeightArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-        }
-
-        if(edgeWeightsIn->connected()) {
-            field::Connection conn = edgeWeightsIn->connections.at(0);
-            edgeWeightsIn->value = static_cast<VertexIndiceGroupWeightArrayField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-        }
-
+        GET_FIELD_DATA(1,FMesh,meshIn,field::connection::In)
+        GET_FIELD_DATA(2,FInt,levelIn,field::connection::In)
+        GET_FIELD_DATA(3,FVertexIndiceGroupWeightArray,vertexWeightsIn,field::connection::In)
+        GET_FIELD_DATA(4,FVertexIndiceGroupWeightArray,edgeWeightsIn,field::connection::In)
+        GET_FIELD_DATA(5,FMesh,meshOut,field::connection::Out)
 
         if(meshIn->update || levelIn->update || vertexWeightsIn->update || edgeWeightsIn->update)
         {
