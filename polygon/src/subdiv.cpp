@@ -21,6 +21,8 @@
  *
  ***********************************************************************/
 
+// A lot of this code comes from OpenSubdiv's far_tutorial_8.cpp
+
 #include "subdiv.hpp"
 
 using namespace feather;
@@ -176,7 +178,6 @@ void subdiv::subdiv_mesh(
     std::vector<subdiv::Vertex> vbuffer(refiner->GetNumVerticesTotal());
     subdiv::Vertex *verts = &vbuffer[0];
 
-
     // Initialize coarse mesh positions
     int nCoarseVerts = meshIn->v.size();
     for (int i=0; i<nCoarseVerts; ++i) {
@@ -201,7 +202,12 @@ void subdiv::subdiv_mesh(
     int firstOfLastVerts = refiner->GetNumVerticesTotal() - nverts;
 
     std::vector<Vertex> normals(nverts);
-    enum subdiv::NormalApproximation normalApproximation = subdiv::CrossTriangle;
+    
+    // CrossTriangle produces random normals for some reason, don't use
+    //enum subdiv::NormalApproximation normalApproximation = subdiv::CrossTriangle;
+    // Limit works, haven't CrossQuad yet 
+    enum subdiv::NormalApproximation normalApproximation = subdiv::Limit;
+
 
     // Different ways to approximate smooth normals
     //
@@ -309,9 +315,11 @@ void subdiv::subdiv_mesh(
     }
 
     // add normals
+    //std::cout << "subdiv: number of verts:" << nverts << " number of normals:" << normals.size() << std::endl;
     for (int vert = 0; vert < nverts; ++vert) {
         float const * pos = normals[vert].GetPosition();
         meshOut->vn.push_back(FVertex3D(pos[0],pos[1],pos[2]));
+        //printf("vn %f %f %f\n", pos[0], pos[1], pos[2]);
     }
 
     // add faces

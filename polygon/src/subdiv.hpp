@@ -101,7 +101,7 @@ namespace subdiv
 
     struct Shape {
         Shape() : scheme(kCatmark), isLeftHanded(false) { }
-        ~Shape() { }
+        ~Shape() { tags.clear(); }
 
         struct tag {
 
