@@ -45,8 +45,10 @@ using namespace feather;
 
 #define ANIMATION_KEY 420
 #define ANIMATION_KEYTRACK 425
+#define ANIMATION_MORPH 426
 
-PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEY,ANIMATION_KEYTRACK)
+
+PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEY,ANIMATION_MORPH)
 
 
 /*
@@ -155,7 +157,7 @@ namespace feather
         // get the min and max key connections
         int i = 0;
         for(auto conn : keys->connections){
-             IntField keytype = static_cast<IntField>(plugin::get_node_field_base(conn.puid,4));
+            IntField keytype = static_cast<IntField>(plugin::get_node_field_base(conn.puid,4));
             RealField keytime = static_cast<RealField>(plugin::get_node_field_base(conn.puid,1));
             std::cout << "key for uid:" << conn.puid << ", time=" << keytime->value << std::endl;
             if(time->value == keytime->value){
@@ -300,6 +302,106 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(ANIMATION_KEYTRACK,node::Animation,"track.svg")
+
+
+
+/*
+ ***************************************
+ *           ANIMATION MORPH           *
+ ***************************************
+*/
+
+// FIELDS
+
+// IN
+
+// base 
+ADD_FIELD_TO_NODE(ANIMATION_MORPH,FMesh,field::MeshArray,field::connection::In,FMesh(),1)
+// targets 
+ADD_FIELD_TO_NODE(ANIMATION_MORPH,FMeshArray,field::MeshArray,field::connection::In,FMeshArray(),2)
+// weights
+ADD_FIELD_TO_NODE(ANIMATION_MORPH,FRealArray,field::Real,field::connection::In,std::vector<FReal>(),3)
+
+// OUT
+
+// mesh 
+ADD_FIELD_TO_NODE(ANIMATION_MORPH,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
+
+namespace feather
+{
+
+    DO_IT(ANIMATION_MORPH)
+    { 
+        // get fields
+        GET_FIELD_DATA(1,FMesh,baseIn,field::connection::In)
+        GET_FIELD_ARRAY_DATA(2,FMeshArray,targetsIn,field::connection::In)
+        GET_FIELD_ARRAY_DATA(3,FRealArray,weightsIn,field::connection::In)
+        GET_FIELD_DATA(4,FMesh,meshOut,field::connection::Out)
+
+        if(weightsIn->update)
+        {
+            // clear the meshOut
+            meshOut->value.v.clear();
+            meshOut->value.st.clear();
+            meshOut->value.vn.clear();
+            meshOut->value.f.clear();
+            meshOut->update = true;
+           
+            if(!baseIn->connections.size())
+                return status(FAILED,"no target meshes in morph node.");
+
+            // if we've made it this far, we will blend the mesh to the final mesh
+            meshOut->value = baseIn->value;
+ 
+            // if there is only the base mesh or there are no weights, just output that
+            if(!targetsIn->connections.size())
+            {
+                return status();
+            }
+   
+            uint id=0;
+
+            for(auto conn : targetsIn->connections)
+            {
+                FMesh* pMesh = &static_cast<field::Field<FMesh>*>(plugin::get_node_field_base(conn.puid,conn.pfid))->value;
+                FReal weight=0.0;
+                if(!weightsIn->connections.size() || weightsIn->connections.size() < id){
+                    if(weightsIn->value.size() <= id) {
+                        weight = 0.0;
+                        weightsIn->value.push_back(weight);
+                    } else {
+                        weight = weightsIn->value[id];
+                    }
+                } else {
+                    // use the connection weight value
+                    weight = static_cast<field::Field<FReal>*>(plugin::get_node_field_base(weightsIn->connections.at(id).puid,weightsIn->connections.at(id).pfid))->value;
+                }
+                for(uint i=0; i < meshOut->value.v.size(); i++){
+                    meshOut->value.v.at(i).x = meshOut->value.v.at(i).x + ( ( pMesh->v.at(i).x - baseIn->value.v.at(i).x ) * weight );
+                    meshOut->value.v.at(i).y = meshOut->value.v.at(i).y + ( ( pMesh->v.at(i).y - baseIn->value.v.at(i).y ) * weight );
+                    meshOut->value.v.at(i).z = meshOut->value.v.at(i).z + ( ( pMesh->v.at(i).z - baseIn->value.v.at(i).z ) * weight );
+                }
+                weight=0.0;
+                id++; 
+            } 
+        }
+
+        return status();
+    };
+
+    /*
+    DRAW_IT(ANIMATION_MORPH)
+    {
+        std::cout << "ANIMATION_MORPH DRAW IT\n";
+        ADD_SHADED_MESH(3)
+        return status();    
+    };
+    */
+
+} // namespace feather
+
+NODE_INIT(ANIMATION_MORPH,node::Animation,"morph.svg")
+
 
 
 /*
