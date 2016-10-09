@@ -227,7 +227,7 @@ bool io::write_obj(std::string filename, obj_data_t& data)
     return true;
 }
 
-feather::status io::export_ply(std::string path, bool selected)
+feather::status io::export_ply(std::string path, bool selected, bool animation, int sframe, int eframe)
 {
     feather::status p;
     std::vector<unsigned int> uids;
@@ -240,23 +240,66 @@ feather::status io::export_ply(std::string path, bool selected)
         feather::plugin::get_nodes(uids);
     }
 
-    for(auto uid : uids){
-        std::cout << "uid:" << uid << " type:" << feather::plugin::get_node_id(uid,p) << std::endl;
-        // for now we are only going to export the mesh out from the shape node
-        if(feather::plugin::get_node_id(uid,p)==320){
-            typedef feather::field::Field<feather::FMesh>* MeshType;
-            MeshType mesh = static_cast<MeshType>(feather::plugin::get_field_base(uid,3));
-            std::string name;
-            feather::plugin::get_node_name(uid,name,p);
-            std::cout << "exporting uid:" << uid << " name:" << name << " to path:" << path << std::endl;
-            bool pass = io::write_ply(path,name,&mesh->value);
-            if(!pass) {
-                std::stringstream ss;
-                ss << "Failed to export " << name << " to ply format.";
-                std::cout << ss.str() << std::endl;
-                return feather::status(feather::FAILED,ss.str().c_str());
+    // get the time node
+    typedef feather::field::Field<feather::FReal>* RealType;
+    RealType ctime = static_cast<RealType>(feather::plugin::get_node_field_base(1,3));
+    RealType fps = static_cast<RealType>(feather::plugin::get_node_field_base(1,4));
+     
+    // setup the animation if animation is set
+    if(animation) {
+        std::cout << "EXPORTING ANIMATED PLYS\n";
+    
+        while ( sframe <= eframe ){
+            std::cout << "EXPORTING ANIMATED PLYS FRAME:" << sframe << std::endl;
+            ctime->value = ( 1.0 / fps->value ) * sframe;
+            ctime->update = true;
+            feather::plugin::update();
+
+            for(auto uid : uids){
+                std::cout << "uid:" << uid << " type:" << feather::plugin::get_node_id(uid,p) << std::endl;
+                // for now we are only going to export the mesh out from the shape node
+                if(feather::plugin::get_node_id(uid,p)==320){
+                    typedef feather::field::Field<feather::FMesh>* MeshType;
+                    MeshType mesh = static_cast<MeshType>(feather::plugin::get_field_base(uid,3));
+                    std::string name;
+                    feather::plugin::get_node_name(uid,name,p);
+                    std::cout << "exporting uid:" << uid << " name:" << name << " to path:" << path << std::endl;
+                    std::stringstream filename;
+                    filename << name << "." << sframe;
+                    bool pass = io::write_ply(path,filename.str(),&mesh->value);
+                    if(!pass) {
+                        std::stringstream ss;
+                        ss << "Failed to export " << name << " to ply format.";
+                        std::cout << ss.str() << std::endl;
+                        return feather::status(feather::FAILED,ss.str().c_str());
+                    }
+                }
+            }
+
+            sframe++;
+        } 
+    } else {
+        std::cout << "EXPORTING PLYS\n";
+ 
+        for(auto uid : uids){
+            std::cout << "uid:" << uid << " type:" << feather::plugin::get_node_id(uid,p) << std::endl;
+            // for now we are only going to export the mesh out from the shape node
+            if(feather::plugin::get_node_id(uid,p)==320){
+                typedef feather::field::Field<feather::FMesh>* MeshType;
+                MeshType mesh = static_cast<MeshType>(feather::plugin::get_field_base(uid,3));
+                std::string name;
+                feather::plugin::get_node_name(uid,name,p);
+                std::cout << "exporting uid:" << uid << " name:" << name << " to path:" << path << std::endl;
+                bool pass = io::write_ply(path,name,&mesh->value);
+                if(!pass) {
+                    std::stringstream ss;
+                    ss << "Failed to export " << name << " to ply format.";
+                    std::cout << ss.str() << std::endl;
+                    return feather::status(feather::FAILED,ss.str().c_str());
+                }
             }
         }
+
     }
 
     return p;

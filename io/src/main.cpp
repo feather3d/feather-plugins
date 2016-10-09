@@ -236,18 +236,38 @@ namespace feather
 
             std::string path;
             bool selection;
+            bool animation;
+            int sframe;
+            int eframe;
 
+            // path
             bool p = params.getParameterValue<std::string>("path",path);
             if(!p)
                 return status(FAILED,"path parameter failed");
- 
+
+            // selection 
             p = params.getParameterValue<bool>("selection",selection);
             if(!p)
                 return status(FAILED,"selection parameter failed");
 
+            // animation 
+            p = params.getParameterValue<bool>("animation",animation);
+            if(!p)
+                return status(FAILED,"animation parameter failed");
+
+            // sframe
+            p = params.getParameterValue<int>("sframe",sframe);
+            if(!p)
+                return status(FAILED,"sframe parameter failed");
+
+            // eframe
+            p = params.getParameterValue<int>("eframe",eframe);
+            if(!p)
+                return status(FAILED,"eframe parameter failed");
+
             //std::vector<unsigned int> uids = plugin::get_selected_nodes();
             //std::cout << "There are " << uids.size() << " nodes selected\n";
-            status pass = io::export_ply(path,selection);
+            status pass = io::export_ply(path,selection,animation,sframe,eframe);
             /*
             for(auto uid : uids){
                 std::cout << "uid:" << uid << " type:" << plugin::get_node_id(uid,pass) << std::endl;
@@ -303,7 +323,11 @@ ADD_PARAMETER(command::EXPORT_PLY,1,parameter::String,"path")
 
 ADD_PARAMETER(command::EXPORT_PLY,2,parameter::Bool,"selection")
 
+ADD_PARAMETER(command::EXPORT_PLY,3,parameter::Bool,"animation")
+
+ADD_PARAMETER(command::EXPORT_PLY,4,parameter::Int,"sframe")
+
+ADD_PARAMETER(command::EXPORT_PLY,5,parameter::Int,"eframe")
 
 INIT_COMMAND_CALLS(EXPORT_PLY)
-
 

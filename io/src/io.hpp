@@ -278,7 +278,7 @@ BOOST_FUSION_ADAPT_STRUCT(
         bool write_mesh(obj_data_t& data);
         bool write_camera_data(std::string filename, unsigned int uid);
         bool write_obj(std::string filename, obj_data_t& data);
-        feather::status export_ply(std::string path, bool selected);
+        feather::status export_ply(std::string path, bool selected, bool animation, int sframe, int eframe);
         bool write_ply(std::string filename, std::string name, feather::FMesh* meshes);
 
         template <int Action, int Format>
