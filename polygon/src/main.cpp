@@ -123,7 +123,8 @@ namespace feather
             //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
             meshOut->update = true;
         } else {
-            std::cout << "POLYGON SHAPE not set to update\n";
+            meshOut->update = false;
+            //std::cout << "POLYGON SHAPE not set to update\n";
         }
 
         return status();
@@ -433,6 +434,8 @@ namespace feather
                     );
 
             meshOut->update = true;
+        } else {
+            meshOut->update = false;
         }
 
         return status();
