@@ -43,54 +43,11 @@ extern "C" {
 
 using namespace feather;
 
-#define ANIMATION_KEY 420
-#define ANIMATION_KEYTRACK 425
+#define ANIMATION_KEYTRACK 420
 #define ANIMATION_MORPH 426
 
 
-PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEY,ANIMATION_MORPH)
-
-
-/*
- ***************************************
- *            ANIMATION KEY            *
- ***************************************
-*/
-
-// time 
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FReal,field::Real,field::connection::In,0.0,1)
-// int value
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FInt,field::Int,field::connection::In,0,2)
-// real value
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FReal,field::Real,field::connection::In,0.0,3)
-// value type 
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FInt,field::Int,field::connection::In,field::Real,4)
-// in curve type 
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FInt,field::Int,field::connection::In,0,5)
-// out curve type 
-ADD_FIELD_TO_NODE(ANIMATION_KEY,FInt,field::Int,field::connection::In,0,6)
-// add curve vectors
-
-namespace feather
-{
-
-    DO_IT(ANIMATION_KEY)
-    { 
-        return status();
-    };
-
-    /*
-    DRAW_IT(ANIMATION_KEY)
-    {
-        std::cout << "ANIMATION_KEY DRAW IT\n";
-        ADD_SHADED_MESH(3)
-        return status();    
-    };
-    */
-
-} // namespace feather
-
-NODE_INIT(ANIMATION_KEY,node::Animation,"key.svg")
+PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEYTRACK,ANIMATION_MORPH)
 
 
 /*
@@ -102,9 +59,11 @@ NODE_INIT(ANIMATION_KEY,node::Animation,"key.svg")
 // time 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::In,0.0,1)
 // keys 
-ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FNodeArray,field::NodeArray,field::connection::In,FNodeArray(),2)
+ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FKeyArray,field::KeyArray,field::connection::In,FKeyArray(),2)
+// keytype 
+ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FInt,field::Int,field::connection::In,1,3)
 // value 
-ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,3)
+ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,4)
 
 namespace feather
 {
@@ -113,94 +72,95 @@ namespace feather
     { 
         typedef field::Field<FInt>*  IntField;
         typedef field::Field<FReal>*  RealField;
-        typedef field::Field<FNodeArray>*  NodeArrayField;
+        typedef field::Field<FKeyArray>*  KeyArrayField;
 
         RealField time;
-        NodeArrayField keys;
+        KeyArrayField keys;
+        IntField keytype;
         RealField value;
 
         for(auto f : fields){
             if(f->id == 1)
                 time = static_cast<RealField>(f);
             if(f->id == 2)
-                keys = static_cast<NodeArrayField>(f);
+                keys = static_cast<KeyArrayField>(f);
             if(f->id == 3)
+                keytype = static_cast<IntField>(f);
+            if(f->id == 4)
                 value = static_cast<RealField>(f);
         }
 
+        // this is not needed at the moment but will probably be needed later
+        /*
         if(!keys->connections.size()){
             std::cout << "no keys connected\n";
             return status();
         }
+        */
 
         std::cout << keys->connections.size() << " keys connected\n";
+        std::cout << keys->value.size() << " keys in track\n";
 
-        // TODO - I need to find a way to automate this so the plugin dev doesn't miss this step, maybe put this in the update process before the doit()
         if(time->connections.size())
             time->value = static_cast<RealField>(plugin::get_node_field_base(time->connections.at(0).puid,time->connections.at(0).pfid))->value;
-        // do the same for the value
+
+        if(keytype->connections.size())
+            keytype->value = static_cast<IntField>(plugin::get_node_field_base(keytype->connections.at(0).puid,keytype->connections.at(0).pfid))->value;
+
         if(value->connections.size())
             value->value = static_cast<RealField>(plugin::get_node_field_base(value->connections.at(0).puid,value->connections.at(0).pfid))->value;
  
-
         // these are the key values from before and after the input time
         // TODO - currently we're only doing linear calculations
-        //FReal minVal=0;
-        //FReal minTime=time->value;
-        //FReal maxVal=0;
-        //FReal maxTime=time->value;
 
-        field::Connection* minConn = nullptr;
-        field::Connection* maxConn = nullptr;
+        FKey* minKey = nullptr;
+        FKey* maxKey = nullptr;
+
         FReal minDeltaTime;
         FReal maxDeltaTime; 
-        // get the min and max key connections
+
         int i = 0;
-        for(auto conn : keys->connections){
-            IntField keytype = static_cast<IntField>(plugin::get_node_field_base(conn.puid,4));
-            RealField keytime = static_cast<RealField>(plugin::get_node_field_base(conn.puid,1));
-            std::cout << "key for uid:" << conn.puid << ", time=" << keytime->value << std::endl;
-            if(time->value == keytime->value){
+        for(auto key : keys->value){
+            //std::cout << "key for uid:" << conn.puid << ", time=" << keytime->value << std::endl;
+            if(time->value == key.time){
                 if(keytype->value == field::Int){
-                    IntField ival = static_cast<IntField>(plugin::get_node_field_base(conn.puid,2));
-                    value->value = static_cast<FReal>(ival->value);
-                    std::cout << "ival = " << ival->value;
+                    value->value = key.value;
+                    std::cout << "ival = " << key.value;
                     std::cout << "1 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 if(keytype->value == field::Real){
-                    RealField rval = static_cast<RealField>(plugin::get_node_field_base(conn.puid,3));
-                    value->value = rval->value;
-                    std::cout << "rval = " << rval->value;
+                    value->value = key.value;
+                    std::cout << "rval = " << key.value;
                     std::cout << "2 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 // we have the value, no need to go any further
                 return status();
             }
 
-            else if(keytime->value < time->value) {
-                if(!minConn){
-                    minDeltaTime = time->value - keytime->value;
-                    std::cout << "setting minConn 1: time:" << keytime->value << std::endl;
-                    minConn = &keys->connections.at(i);
+            else if(key.time < time->value) {
+                if(!minKey){
+                    minDeltaTime = time->value - key.time;
+                    std::cout << "setting minConn 1: time:" << key.time << std::endl;
+                    minKey = &key;
                 } else {
-                    if(keytime->value > (time->value - minDeltaTime)){
-                        minConn = &keys->connections.at(i);
-                        std::cout << "setting minConn 2: time:" << keytime->value << std::endl;
-                        minDeltaTime = time->value - keytime->value;
+                    if(key.time > (time->value - minDeltaTime)){
+                        minKey = &key;
+                        std::cout << "setting minConn 2: time:" << key.time << std::endl;
+                        minDeltaTime = time->value - key.time;
                     }
                 }
             }
 
-            else if(keytime->value > time->value) {
-                if(!maxConn){
-                    maxDeltaTime = keytime->value - time->value;
-                    std::cout << "setting maxConn 1: time:" << keytime->value << std::endl;
-                    maxConn = &keys->connections.at(i);
+            else if(key.time > time->value) {
+                if(!maxKey){
+                    maxDeltaTime = key.time - time->value;
+                    std::cout << "setting maxConn 1: time:" << key.time << std::endl;
+                    maxKey = &key;
                 } else {
-                    if(keytime->value < (time->value + maxDeltaTime)){
-                        maxConn = &keys->connections.at(i);
-                        std::cout << "setting maxConn 2: time:" << keytime->value << std::endl;
-                        maxDeltaTime = keytime->value - time->value;
+                    if(key.time < (time->value + maxDeltaTime)){
+                        maxKey = &key;
+                        std::cout << "setting maxConn 2: time:" << key.time << std::endl;
+                        maxDeltaTime = key.time - time->value;
                     }
                 }
             }
@@ -209,40 +169,34 @@ namespace feather
             //std::cout << "key for uid:" << conn.puid << ", ival=" << ival->value << ", rval=" << rval->value << ", time=" << time->value << std::endl;
         }
 
+
         // If we've made it this far, the value has to be calculated.
         // If there are no keys before the time, we'll use the first key's value
         // If there are no keys after the time, we'll use the last key's value
         // calculate the output value
-        if(!minConn){
-            IntField keytype = static_cast<IntField>(plugin::get_node_field_base(maxConn->puid,4));
-            RealField keytime = static_cast<RealField>(plugin::get_node_field_base(maxConn->puid,1));
-            if(time->value == keytime->value){
+
+        if(!minKey){
+            if(time->value == maxKey->time){
                 if(keytype->value == field::Int){
-                    IntField ival = static_cast<IntField>(plugin::get_node_field_base(maxConn->puid,2));
-                    value->value = static_cast<FReal>(ival->value);
+                    value->value = maxKey->value;
                     std::cout << "3 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 if(keytype->value == field::Real){
-                    RealField rval = static_cast<RealField>(plugin::get_node_field_base(maxConn->puid,3));
-                    value->value = rval->value;
+                    value->value = maxKey->value;
                     std::cout << "4 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 // we have the value, no need to go any further
                 return status();
             }
         }
-        else if(!maxConn){
-            IntField keytype = static_cast<IntField>(plugin::get_node_field_base(minConn->puid,4));
-            RealField keytime = static_cast<RealField>(plugin::get_node_field_base(minConn->puid,1));
-            if(time->value == keytime->value){
+        else if(!maxKey){
+            if(time->value == minKey->time){
                 if(keytype->value == field::Int){
-                    IntField ival = static_cast<IntField>(plugin::get_node_field_base(minConn->puid,2));
-                    value->value = static_cast<FReal>(ival->value);
+                    value->value = minKey->value;
                     std::cout << "5 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 if(keytype->value == field::Real){
-                    RealField rval = static_cast<RealField>(plugin::get_node_field_base(minConn->puid,3));
-                    value->value = rval->value;
+                    value->value = minKey->value;
                     std::cout << "6 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 // we have the value, no need to go any further
@@ -250,43 +204,30 @@ namespace feather
             }
         }
         else {
-            IntField maxkeytype = static_cast<IntField>(plugin::get_node_field_base(minConn->puid,4));
-            IntField minkeytype = static_cast<IntField>(plugin::get_node_field_base(maxConn->puid,4));
-            RealField minkeytime = static_cast<RealField>(plugin::get_node_field_base(minConn->puid,1));
-            RealField maxkeytime = static_cast<RealField>(plugin::get_node_field_base(maxConn->puid,1));
             FReal minvalue;
             FReal maxvalue;
 
-            // min value
-            if(minkeytype->value == field::Int){
-                IntField ival = static_cast<IntField>(plugin::get_node_field_base(minConn->puid,2));
-                minvalue = static_cast<FReal>(ival->value);
+            // Yea, I know a lot of this is not needed and I'll fix it
+            if(keytype->value == field::Int){
+                minvalue = minKey->value;
+                maxvalue = maxKey->value;
+ 
             }
-            if(minkeytype->value == field::Real){
-                RealField rval = static_cast<RealField>(plugin::get_node_field_base(minConn->puid,3));
-                minvalue = rval->value;
+            if(keytype->value == field::Real){
+                minvalue = minKey->value;
+                maxvalue = maxKey->value;
             }
 
-            // max value
-            if(maxkeytype->value == field::Int){
-                IntField ival = static_cast<IntField>(plugin::get_node_field_base(maxConn->puid,2));
-                maxvalue = static_cast<FReal>(ival->value);
-            }
-            if(maxkeytype->value == field::Real){
-                RealField rval = static_cast<RealField>(plugin::get_node_field_base(maxConn->puid,3));
-                maxvalue = rval->value;
-            }
-        
             // do a single rise run calculation to set the out value
             FReal rise = maxvalue - minvalue;
-            FReal run = maxkeytime->value - minkeytime->value;
+            FReal run = maxKey->time - minKey->time;
             FReal slope = rise/run;
-            value->value = minvalue + ((time->value - minkeytime->value) * slope);            
+            value->value = minvalue + ((time->value - minKey->time) * slope);            
             std::cout << "On step 7, "
                 << " minVal:" << minvalue
-                << " minTime:" << minkeytime->value
+                << " minTime:" << minKey->time 
                 << " maxVal:" << maxvalue
-                << " maxTime:" << maxkeytime->value
+                << " maxTime:" << maxKey->time
                 << " rise:" << rise
                 << " run:" << run
                 << " slope:" << slope
@@ -296,6 +237,10 @@ namespace feather
             value->update = true;
         }
 
+        std::cout << "The KeyTrack Node Keys:\n";
+        for ( auto key : keys->value )
+            std::cout << "\ttime:" << key.time << " value:" << key.value << std::endl;
+ 
         return status();
     };
 
@@ -418,24 +363,53 @@ namespace feather
 
         // add key
         status add_key(parameter::ParameterList params) {
-            double time; 
-            bool pass = params.getParameterValue<double>("time",time);
+            FReal time; 
+            bool pass = params.getParameterValue<FReal>("time",time);
             if(!pass)
                 return status(FAILED,"time parameter failed");
 
-            // add key to scenegraph
+            FReal value; 
+            pass = params.getParameterValue<FReal>("value",value);
+            if(!pass)
+                return status(FAILED,"value parameter failed");
+
+            unsigned int uid; 
+            pass = params.getParameterValue<unsigned int>("uid",uid);
+            if(!pass)
+                return status(FAILED,"uid parameter failed");
+
+            unsigned int fid; 
+            pass = params.getParameterValue<unsigned int>("fid",fid);
+            if(!pass)
+                return status(FAILED,"fid parameter failed");
+
+            // get the field base and check if it's already connected to a track
+            field::FieldBase* field = plugin::get_node_field_base(uid,fid);
+            // if nothing is connected
+            typedef field::Field<FKeyArray>* KeyArrayField;
+ 
             status p;
-            unsigned int uid = plugin::add_node(ANIMATION_KEY,"key",p);
+            if(!field->connections.size()) {
+                // make a track and add the value at the current time
+                unsigned int track = plugin::add_node(ANIMATION_KEYTRACK,"track",p);
+                plugin::connect(track,4,uid,fid);
+                plugin::connect(uid,202,track,201);
+                static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->value.push_back(FKey(value,time));
+            } else {
+                field::FieldBase* conn = plugin::get_node_field_base(field->connections.at(0).puid,2); 
+                std::cout << "Looking for animation keytrack on connection 0 - uid:" << field->connections.at(0).puid << " fid:" << field->connections.at(0).pfid << " nid:" << conn->id << std::endl;
+                // we have a connection, and most likely it's a track but let's check just to be safe
+                if(plugin::get_node_id(field->connections.at(0).puid,p) == ANIMATION_KEYTRACK){
+                    static_cast<KeyArrayField>(conn)->value.push_back(FKey(value,time));
+                } else {
+                    // it's not a key track so let's get out of here
+                    std::cout << "can't add key because something other then a key track is attached to the field\n";
+                    return status(FAILED,"something other then a key track is attached to the field");
+                }
+            } 
 
-            // set the time of the key
-            typedef field::Field<feather::FReal>* sourcefield;
-            sourcefield sf=NULL;
-            sf = static_cast<sourcefield>(feather::plugin::get_node_field_base(uid,1));
-            sf->value = time;
+            std::cout << "added key to field\n";
 
-            // connect to the root for now
-            plugin::connect(0,202,uid,201);
-        
             // update scenegraph            
             plugin::update();
             
@@ -450,5 +424,8 @@ namespace feather
 
 ADD_COMMAND("add_key",ADD_KEY,add_key)
 ADD_PARAMETER(command::ADD_KEY,1,parameter::Real,"time")
+ADD_PARAMETER(command::ADD_KEY,2,parameter::Real,"value")
+ADD_PARAMETER(command::ADD_KEY,3,parameter::Int,"fid")
+ADD_PARAMETER(command::ADD_KEY,4,parameter::Int,"uid")
 
 INIT_COMMAND_CALLS(ADD_KEY)
