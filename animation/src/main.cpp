@@ -61,7 +61,7 @@ ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::In,0.0
 // keys 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FKeyArray,field::KeyArray,field::connection::In,FKeyArray(),2)
 // keytype 
-ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FInt,field::Int,field::connection::In,1,3)
+ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FInt,field::Int,field::connection::In,field::Real,3)
 // value 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,4)
 
@@ -104,6 +104,9 @@ namespace feather
         if(time->connections.size())
             time->value = static_cast<RealField>(plugin::get_node_field_base(time->connections.at(0).puid,time->connections.at(0).pfid))->value;
 
+        if(keys->connections.size())
+            keys->value = static_cast<KeyArrayField>(plugin::get_node_field_base(keys->connections.at(0).puid,keys->connections.at(0).pfid))->value;
+
         if(keytype->connections.size())
             keytype->value = static_cast<IntField>(plugin::get_node_field_base(keytype->connections.at(0).puid,keytype->connections.at(0).pfid))->value;
 
@@ -119,9 +122,11 @@ namespace feather
         FReal minDeltaTime;
         FReal maxDeltaTime; 
 
+        std::cout << "KEYTRACK UPDATE\n";
+ 
         int i = 0;
-        for(auto key : keys->value){
-            //std::cout << "key for uid:" << conn.puid << ", time=" << keytime->value << std::endl;
+        for(auto key : keys->value) {
+            std::cout << "\tkey value:" << key.value << " time:" << key.time << std::endl;
             if(time->value == key.time){
                 if(keytype->value == field::Int){
                     value->value = key.value;
@@ -141,10 +146,10 @@ namespace feather
                 if(!minKey){
                     minDeltaTime = time->value - key.time;
                     std::cout << "setting minConn 1: time:" << key.time << std::endl;
-                    minKey = &key;
+                    minKey = &keys->value[i];
                 } else {
                     if(key.time > (time->value - minDeltaTime)){
-                        minKey = &key;
+                        minKey = &keys->value[i];
                         std::cout << "setting minConn 2: time:" << key.time << std::endl;
                         minDeltaTime = time->value - key.time;
                     }
@@ -155,10 +160,10 @@ namespace feather
                 if(!maxKey){
                     maxDeltaTime = key.time - time->value;
                     std::cout << "setting maxConn 1: time:" << key.time << std::endl;
-                    maxKey = &key;
+                    maxKey = &keys->value[i];
                 } else {
                     if(key.time < (time->value + maxDeltaTime)){
-                        maxKey = &key;
+                        maxKey = &keys->value[i];
                         std::cout << "setting maxConn 2: time:" << key.time << std::endl;
                         maxDeltaTime = key.time - time->value;
                     }
@@ -185,6 +190,7 @@ namespace feather
                     value->value = maxKey->value;
                     std::cout << "4 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
+                value->value = maxKey->value;
                 // we have the value, no need to go any further
                 return status();
             }
@@ -199,6 +205,7 @@ namespace feather
                     value->value = minKey->value;
                     std::cout << "6 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
+                value->value = minKey->value;
                 // we have the value, no need to go any further
                 return status();
             }
@@ -217,7 +224,10 @@ namespace feather
                 minvalue = minKey->value;
                 maxvalue = maxKey->value;
             }
-
+            
+            minvalue = minKey->value;
+            maxvalue = maxKey->value;
+ 
             // do a single rise run calculation to set the out value
             FReal rise = maxvalue - minvalue;
             FReal run = maxKey->time - minKey->time;
@@ -392,15 +402,22 @@ namespace feather
             if(!field->connections.size()) {
                 // make a track and add the value at the current time
                 unsigned int track = plugin::add_node(ANIMATION_KEYTRACK,"track",p);
+                // out value connection
                 plugin::connect(track,4,uid,fid);
+                // parent child connection
                 plugin::connect(uid,202,track,201);
+                // in time connection
+                plugin::connect(1,7,track,1);
                 static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->value.push_back(FKey(value,time));
+                static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->update = true;
             } else {
                 field::FieldBase* conn = plugin::get_node_field_base(field->connections.at(0).puid,2); 
                 std::cout << "Looking for animation keytrack on connection 0 - uid:" << field->connections.at(0).puid << " fid:" << field->connections.at(0).pfid << " nid:" << conn->id << std::endl;
                 // we have a connection, and most likely it's a track but let's check just to be safe
                 if(plugin::get_node_id(field->connections.at(0).puid,p) == ANIMATION_KEYTRACK){
+                    std::cout << "add_key command is adding key at time:" << time << " value:" << value << std::endl;
                     static_cast<KeyArrayField>(conn)->value.push_back(FKey(value,time));
+                    static_cast<KeyArrayField>(conn)->update = true;
                 } else {
                     // it's not a key track so let's get out of here
                     std::cout << "can't add key because something other then a key track is attached to the field\n";
