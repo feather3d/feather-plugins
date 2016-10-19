@@ -31,6 +31,7 @@
 #include <feather/draw.hpp>
 #include <feather/plugin.hpp>
 #include <feather/tools.hpp>
+#include <feather/curve.hpp>
 #include <QColor>
 
 #ifdef __cplusplus
@@ -60,7 +61,7 @@ PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATIO
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::In,0.0,1)
 // keys 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FKeyArray,field::KeyArray,field::connection::In,FKeyArray(),2)
-// keytype 
+// type 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FInt,field::Int,field::connection::In,field::Real,3)
 // value 
 ADD_FIELD_TO_NODE(ANIMATION_KEYTRACK,FReal,field::Real,field::connection::Out,0.0,4)
@@ -184,11 +185,11 @@ namespace feather
             if(time->value == maxKey->time){
                 if(keytype->value == field::Int){
                     value->value = maxKey->value;
-                    std::cout << "3 KEY TRACK OUT VALUE = " << value->value << std::endl;
+                    //std::cout << "3 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 if(keytype->value == field::Real){
                     value->value = maxKey->value;
-                    std::cout << "4 KEY TRACK OUT VALUE = " << value->value << std::endl;
+                    //std::cout << "4 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 value->value = maxKey->value;
                 // we have the value, no need to go any further
@@ -199,11 +200,11 @@ namespace feather
             if(time->value == minKey->time){
                 if(keytype->value == field::Int){
                     value->value = minKey->value;
-                    std::cout << "5 KEY TRACK OUT VALUE = " << value->value << std::endl;
+                    //std::cout << "5 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 if(keytype->value == field::Real){
                     value->value = minKey->value;
-                    std::cout << "6 KEY TRACK OUT VALUE = " << value->value << std::endl;
+                    //std::cout << "6 KEY TRACK OUT VALUE = " << value->value << std::endl;
                  }
                 value->value = minKey->value;
                 // we have the value, no need to go any further
@@ -232,7 +233,12 @@ namespace feather
             FReal rise = maxvalue - minvalue;
             FReal run = maxKey->time - minKey->time;
             FReal slope = rise/run;
-            value->value = minvalue + ((time->value - minKey->time) * slope);            
+            // linear calculated value
+            //value->value = minvalue + ((time->value - minKey->time) * slope);            
+            // bezier calculated value
+            value->value = feather::curve::get_cubic_bezier_x(FPoint2D(minKey->time,minKey->value),minKey->outcp,maxKey->incp,FPoint2D(maxKey->time,maxKey->value),time->value,24.0);
+
+            /*
             std::cout << "On step 7, "
                 << " minVal:" << minvalue
                 << " minTime:" << minKey->time 
@@ -244,13 +250,16 @@ namespace feather
                 << std::endl
                 ;
             std::cout << "7 KEY TRACK OUT VALUE = " << value->value << std::endl;
+            */
             value->update = true;
         }
 
+        /* 
         std::cout << "The KeyTrack Node Keys:\n";
         for ( auto key : keys->value )
             std::cout << "\ttime:" << key.time << " value:" << key.value << std::endl;
- 
+        */
+
         return status();
     };
 
@@ -408,7 +417,7 @@ namespace feather
                 plugin::connect(uid,202,track,201);
                 // in time connection
                 plugin::connect(1,7,track,1);
-                static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->value.push_back(FKey(value,time));
+                static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->value.push_back(FKey(value,time,curve::Bezier,FPoint2D(time-1.0,value),curve::Bezier,FPoint2D(time+1.0,value)));
                 static_cast<KeyArrayField>(plugin::get_node_field_base(track,2))->update = true;
             } else {
                 field::FieldBase* conn = plugin::get_node_field_base(field->connections.at(0).puid,2); 
@@ -416,7 +425,7 @@ namespace feather
                 // we have a connection, and most likely it's a track but let's check just to be safe
                 if(plugin::get_node_id(field->connections.at(0).puid,p) == ANIMATION_KEYTRACK){
                     std::cout << "add_key command is adding key at time:" << time << " value:" << value << std::endl;
-                    static_cast<KeyArrayField>(conn)->value.push_back(FKey(value,time));
+                    static_cast<KeyArrayField>(conn)->value.push_back(FKey(value,time,curve::Bezier,FPoint2D(time-1.0,value),curve::Bezier,FPoint2D(time+1.0,value)));
                     static_cast<KeyArrayField>(conn)->update = true;
                 } else {
                     // it's not a key track so let's get out of here
