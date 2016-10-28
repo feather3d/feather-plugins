@@ -161,7 +161,7 @@ namespace feather
                     if(p.state==feather::FAILED)
                         std::cout << p.msg << std::endl;
 
-                    feather::scenegraph::update();
+                    //feather::scenegraph::update();
 
                     // get the mesh from the node and fill in it's values
                     typedef field::Field<feather::FMesh>* sourcefield;
@@ -187,6 +187,7 @@ namespace feather
                             i++;
                         }
                         vstep += objdata.mesh.v.size();
+                        sf->update = true;
                     }
                     else
                         std::cout << "NULL SOURCE FIELD\n";
@@ -197,7 +198,7 @@ namespace feather
 
                     //std::cout << "added " << uid << " to the uid_update state which is " << feather::cstate.uid_update.size() << std::endl;
                     
-                    //feather::scenegraph::update();
+                    feather::scenegraph::update();
             });
 
             return s;

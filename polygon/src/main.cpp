@@ -87,7 +87,14 @@ namespace feather
                 meshOut = static_cast<MeshField>(f);
          }
 
-        if(xformIn->update || meshIn->update)
+        if(meshIn->connected()) {
+            field::Connection conn = meshIn->connections.at(0);
+            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+            meshIn->update = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->update;
+        }
+
+
+        if(meshIn->update)
         {
             std::cout << "POLYGON SHAPE UPDATE\n";
             /* 
@@ -102,29 +109,30 @@ namespace feather
                 << "type:" << testIn->type << std::endl;
             */
 
+            /*
             if(xformIn->connected()) {
                 field::Connection conn = xformIn->connections.at(0);
                 xformIn->value = static_cast<MatrixField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
             }
+            */
 
+            /*
             if(meshIn->connected()) {
                 field::Connection conn = meshIn->connections.at(0);
                 meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
             }
+            */
 
             meshOut->value = meshIn->value;
             // modify the mesh location based on the xform input
             //std::cout << "BEFORE\n";
             //for(auto v : meshOut->value.v)
             //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
-            tools::apply_matrix_to_mesh(&xformIn->value,meshOut->value);
+            //tools::apply_matrix_to_mesh(&xformIn->value,meshOut->value);
             //std::cout << "AFTER\n";
             //for(auto v : meshOut->value.v)
             //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
             meshOut->update = true;
-        } else {
-            meshOut->update = false;
-            //std::cout << "POLYGON SHAPE not set to update\n";
         }
 
         return status();
@@ -415,6 +423,7 @@ namespace feather
 
         if(meshIn->update || levelIn->update || vertexWeightsIn->update || edgeWeightsIn->update)
         {
+            std::cout << "SUBDIV DO_IT() UPDATE\n";
             // if there is no input mesh, get out of here
             if(!meshIn->value.v.size())
                 return status();
@@ -434,8 +443,6 @@ namespace feather
                     );
 
             meshOut->update = true;
-        } else {
-            meshOut->update = false;
         }
 
         return status();
@@ -485,6 +492,7 @@ namespace feather
         if(meshIn->connected()) {
             field::Connection conn = meshIn->connections.at(0);
             meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+            meshIn->update = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->update;
         }
 
         if(meshIn->update)

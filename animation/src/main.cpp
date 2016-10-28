@@ -45,6 +45,7 @@ extern "C" {
 using namespace feather;
 
 #define ANIMATION_KEYTRACK 420
+#define ANIMATION_BONE 421
 #define ANIMATION_MORPH 426
 
 
@@ -266,6 +267,37 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(ANIMATION_KEYTRACK,node::Animation,"track.svg")
+
+
+
+/*
+ ***************************************
+ *           ANIMATION BONE            *
+ ***************************************
+*/
+
+// FIELDS
+// currently bones have no fields but will later when other features are added
+
+namespace feather
+{
+
+    DO_IT(ANIMATION_BONE)
+    { 
+        return status();
+    };
+
+    /*
+    DRAW_IT(ANIMATION_BONE)
+    {
+        std::cout << "ANIMATION_BONE DRAW IT\n";
+        return status();    
+    };
+    */
+
+} // namespace feather
+
+NODE_INIT(ANIMATION_BONE,node::Animation,"bone.svg")
 
 
 
