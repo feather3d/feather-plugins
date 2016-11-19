@@ -1,6 +1,7 @@
 PROJECT(feather_deformer)
 
 FIND_PACKAGE(OpenGL REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS system REQUIRED)
 
 SET(feather_deformer_SRCS
     main.cpp
@@ -11,6 +12,7 @@ ADD_DEFINITIONS("-D GL_GLEXT_PROTOTYPES")
 ADD_LIBRARY(feather_deformer SHARED ${feather_deformer_SRCS})
 
 TARGET_LINK_LIBRARIES(feather_deformer
+    ${Boost_SYSTEM_LIBRARY} 
     /usr/lib/feather/libfeather_plugin.so
 )
 

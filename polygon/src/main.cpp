@@ -27,11 +27,10 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
-#include <feather/scenegraph.hpp>
+//#include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
 #include <feather/tools.hpp>
 #include <feather/plugin.hpp>
-#include <QColor>
 
 #include "subdiv.hpp"
 
@@ -77,6 +76,7 @@ namespace feather
         MeshField meshIn=0;
         MeshField meshOut=0;
         MatrixField xformIn=0;
+        MatrixField worldMatrixOut=0;
 
         for(auto f : fields){
             if(f->id == 1)
@@ -85,18 +85,22 @@ namespace feather
                 xformIn = static_cast<MatrixField>(f);
             if(f->id == 3)
                 meshOut = static_cast<MeshField>(f);
+            if(f->id == 214)
+                worldMatrixOut = static_cast<MatrixField>(f);
          }
 
         if(meshIn->connected()) {
             field::Connection conn = meshIn->connections.at(0);
-            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-            meshIn->update = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->update;
+            meshIn->value = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
+            meshIn->update = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->update;
         }
 
 
-        if(meshIn->update)
+        if(meshIn->update || worldMatrixOut->update)
         {
             std::cout << "POLYGON SHAPE UPDATE\n";
+
+
             /* 
             std::cout << "SHAPE testIn ATTRIBUTES:\n"
                 << "fid:" << testIn->id << std::endl
@@ -112,14 +116,14 @@ namespace feather
             /*
             if(xformIn->connected()) {
                 field::Connection conn = xformIn->connections.at(0);
-                xformIn->value = static_cast<MatrixField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+                xformIn->value = static_cast<MatrixField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
             }
             */
 
             /*
             if(meshIn->connected()) {
                 field::Connection conn = meshIn->connections.at(0);
-                meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
+                meshIn->value = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
             }
             */
 
@@ -133,7 +137,14 @@ namespace feather
             //for(auto v : meshOut->value.v)
             //    std::cout << "meshOut.x = " << v.x << " meshOut.y = " << v.y << " meshOut.z = " << v.z << std::endl;
             meshOut->update = true;
-        }
+            std::cout << "SHAPE MATRIX\n";
+            //worldMatrixOut->value.print();
+            //std::cout << "mesh before\n";
+            //meshOut->value.print();
+            meshOut->value.apply_matrix(worldMatrixOut->value);
+            //std::cout << "mesh after\n";
+            //meshOut->value.print();
+         }
 
         return status();
     };
@@ -168,7 +179,7 @@ namespace feather
 
     DO_IT(POLYGON_PLANE)
     { 
-        //field::FieldBase* f = feather::scenegraph::get_fieldBase(node.uid,320,3);
+        //field::FieldBase* f = feather::plugin::get_field_base(node.uid,320,3);
 
         //std::cout << "Polygon Plane - DO_IT()\n";
         typedef field::Field<FMesh>* MeshOut;
@@ -235,11 +246,14 @@ namespace feather
     {
         typedef field::Field<FMesh>* MeshOut;
         typedef field::Field<int>* SubIn;
+        typedef field::Field<FMatrix4x4>* MatrixField;
 
         MeshOut meshOut=nullptr;
         SubIn subX=0;
         SubIn subY=0;
         SubIn subZ=0;
+        MatrixField worldMatrixOut;
+
         for(auto f : fields){
             if(f->id == 1)
                 subX = static_cast<SubIn>(f);
@@ -249,6 +263,8 @@ namespace feather
                 subZ = static_cast<SubIn>(f);
             if(f->id == 4)
                 meshOut = static_cast<MeshOut>(f);
+            if(f->id == 214)
+                worldMatrixOut = static_cast<MatrixField>(f);
         }
         if(!meshOut) {
             //std::cout << "could not find meshOut\n";
@@ -266,7 +282,7 @@ namespace feather
         //int fcount = (subX->value+1)*2 + (subY->value+1)*2 + (subZ->value+1)*2;
         //int vcount = fcount + 2;
 
-        if(subX->update || subY->update || subZ->update)
+        if(subX->update || subY->update || subZ->update || worldMatrixOut->update)
         {
             // clear the mesh
             meshOut->value.v.clear();
@@ -375,6 +391,13 @@ namespace feather
                 f.clear();
             }
 
+            std::cout << "CUBE MATRIX\n";
+            worldMatrixOut->value.print();
+            std::cout << "mesh before\n";
+            meshOut->value.print();
+            meshOut->value.apply_matrix(worldMatrixOut->value);
+            std::cout << "mesh after\n";
+            meshOut->value.print();
             subX->update = false;
             subY->update = false;
             subZ->update = false;
@@ -491,8 +514,8 @@ namespace feather
 
         if(meshIn->connected()) {
             field::Connection conn = meshIn->connections.at(0);
-            meshIn->value = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->value;
-            meshIn->update = static_cast<MeshField>(scenegraph::get_fieldBase(conn.puid,conn.pnid,conn.pfid,0))->update;
+            meshIn->value = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->value;
+            meshIn->update = static_cast<MeshField>(plugin::get_field_base(conn.puid,conn.pnid,conn.pfid,0))->update;
         }
 
         if(meshIn->update)

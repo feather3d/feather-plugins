@@ -151,13 +151,13 @@ namespace feather
 
             for_each(data.object.begin(), data.object.end(), [&meshuid,&shapeuid,&vstep,&s] (object_t& objdata) {
                     // add the nodes to the scenegraph
-                    meshuid = feather::scenegraph::add_node(324,objdata.o,s);
+                    meshuid = feather::plugin::add_node(324,objdata.o,s);
                     std::stringstream shapename;
                     shapename << objdata.o << "_shape";
-                    shapeuid = feather::scenegraph::add_node(320,shapename.str(),s);
+                    shapeuid = feather::plugin::add_node(320,shapename.str(),s);
                     std::cout << "mesh uid:" << meshuid << std::endl;
                     // for now I'm just going to connect the root to the node 
-                    feather::status p = feather::scenegraph::connect(0,202,meshuid,201);
+                    feather::status p = feather::plugin::connect(0,202,meshuid,201);
                     if(p.state==feather::FAILED)
                         std::cout << p.msg << std::endl;
 
@@ -168,7 +168,7 @@ namespace feather
                     sourcefield sf=NULL;
 
                     // NOTE: you can't call feather::sg[uid] from here - you will get a seg fault 
-                    sf = static_cast<sourcefield>(feather::scenegraph::get_fieldBase(meshuid,324,1,0));
+                    sf = static_cast<sourcefield>(feather::plugin::get_field_base(meshuid,324,1,0));
                     if(sf){
                         // only going to do the first object as a test
                         // fill in the mesh
@@ -193,12 +193,12 @@ namespace feather
                         std::cout << "NULL SOURCE FIELD\n";
 
                     // connect the mesh node to the shape node
-                    p = feather::scenegraph::connect(meshuid,202,shapeuid,201);
-                    p = feather::scenegraph::connect(meshuid,2,shapeuid,1);
+                    p = feather::plugin::connect(meshuid,202,shapeuid,201);
+                    p = feather::plugin::connect(meshuid,2,shapeuid,1);
 
                     //std::cout << "added " << uid << " to the uid_update state which is " << feather::cstate.uid_update.size() << std::endl;
                     
-                    feather::scenegraph::update();
+                    feather::plugin::update();
             });
 
             return s;

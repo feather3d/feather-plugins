@@ -1,6 +1,7 @@
 PROJECT(feather_animation)
 
 FIND_PACKAGE(OpenGL REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS system REQUIRED)
 
 SET(feather_animation_SRCS
     main.cpp
@@ -11,6 +12,7 @@ ADD_DEFINITIONS("-D GL_GLEXT_PROTOTYPES")
 ADD_LIBRARY(feather_animation SHARED ${feather_animation_SRCS})
 
 TARGET_LINK_LIBRARIES(feather_animation
+    ${Boost_SYSTEM_LIBRARY} 
     /usr/lib/feather/libfeather_plugin.so
 )
 
