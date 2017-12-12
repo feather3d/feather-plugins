@@ -24,4 +24,4 @@ SET_TARGET_PROPERTIES(feather_deformer
     SOVERSION 1)
 
 INSTALL(TARGETS feather_deformer
-    LIBRARY DESTINATION /usr/local/feather/plugins)
+    LIBRARY DESTINATION /usr/share/feather/plugins)

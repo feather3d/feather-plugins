@@ -4,4 +4,4 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 FILE(GLOB OBJ_FILES "*.obj")
 
-INSTALL(FILES ${OBJ_FILES} DESTINATION /usr/local/feather/tests)
+INSTALL(FILES ${OBJ_FILES} DESTINATION /usr/share/feather/tests)
