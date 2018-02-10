@@ -393,6 +393,7 @@ namespace feather
     namespace command
     {
         enum Command { N=0 };
+
     } // namespace command
 
 } // namespace feather

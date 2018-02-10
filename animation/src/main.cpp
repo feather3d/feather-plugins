@@ -71,7 +71,7 @@ namespace feather
 {
 
     DO_IT(ANIMATION_KEYTRACK)
-    { 
+    {
         typedef field::Field<FInt>*  IntField;
         typedef field::Field<FReal>*  RealField;
         typedef field::Field<FKeyArray>*  KeyArrayField;
@@ -125,6 +125,18 @@ namespace feather
         FReal maxDeltaTime; 
 
         std::cout << "KEYTRACK UPDATE\n";
+
+        // If there are no keys, don't bother doing anymore
+        if(!keys->value.size()) {
+            value->value=0;
+            return status();
+        }
+
+        // if there is only one key, return that value
+        if(keys->value.size() == 1) {
+            value->value=keys->value[0].value;
+            return status();
+        }
  
         int i = 0;
         for(auto key : keys->value) {
@@ -176,13 +188,19 @@ namespace feather
             //std::cout << "key for uid:" << conn.puid << ", ival=" << ival->value << ", rval=" << rval->value << ", time=" << time->value << std::endl;
         }
 
+        // if the min or max key was not set, set if to the input key
+        if(!minKey)
+            minKey = &keys->value[0];
+
+        if(!maxKey)
+            maxKey = &keys->value[keys->value.size()-1];
 
         // If we've made it this far, the value has to be calculated.
         // If there are no keys before the time, we'll use the first key's value
         // If there are no keys after the time, we'll use the last key's value
         // calculate the output value
 
-        if(!minKey){
+        if(!minKey) {
             if(time->value == maxKey->time){
                 if(keytype->value == field::Int){
                     value->value = maxKey->value;
@@ -197,7 +215,7 @@ namespace feather
                 return status();
             }
         }
-        else if(!maxKey){
+        else if(!maxKey) {
             if(time->value == minKey->time){
                 if(keytype->value == field::Int){
                     value->value = minKey->value;
