@@ -23,6 +23,8 @@
 
 #include <feather/deps.hpp>
 #include <feather/pluginmanager.hpp>
+#include <feather/plugin.hpp>
+#include <feather/tools.hpp>
 #include <feather/field.hpp>
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
