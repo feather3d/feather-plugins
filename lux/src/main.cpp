@@ -25,6 +25,7 @@
 #include <feather/pluginmanager.hpp>
 #include <feather/plugin.hpp>
 #include <feather/tools.hpp>
+#include <feather/render.hpp>
 #include <feather/field.hpp>
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
@@ -61,6 +62,8 @@ using namespace feather;
 // 551-560 - lights
 // 561-570 - camera 
 
+#define LUX_RENDER_ID 1
+
 #define LUX_SHADER_MATTE 511
 #define LUX_SHADER_EMISSION 512
 #define LUX_CAMERA_PERSPECTIVE 561
@@ -71,8 +74,8 @@ using namespace feather;
  *              PLUGIN INIT            *
  ***************************************
  */ 
-PLUGIN_INIT("LuxRender","LuxRender nodes and commands","Richard Layman",LUX_SHADER_MATTE,LUX_CAMERA_PERSPECTIVE)
 
+PLUGIN_INIT("LuxRender","LuxRender nodes and commands","Richard Layman",LUX_SHADER_MATTE,LUX_CAMERA_PERSPECTIVE)
 
 /*
  ***************************************
@@ -92,7 +95,17 @@ namespace feather
         return status();
     };
 
+
+    RENDER_BUFFER(LUX_RENDER_ID)
+    {
+        std::cout << "LuxRender Render Buffer Called\n";
+        return status();
+    };
+
 } // namespace feather
+
+
+RENDER_INIT(LUX_RENDER_ID,"LuxRender")
 
 
 NODE_INIT(LUX_SHADER_MATTE,node::Shader,"")
