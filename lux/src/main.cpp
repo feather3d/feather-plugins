@@ -30,6 +30,14 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
+#include <luxcore/luxcore.h>
+#include <luxrays/utils/properties.h>
+#include <slg/slg.h>
+#include <chrono>
+#include <thread>
+
+
+
 
 /*
  ***************************************
@@ -95,10 +103,144 @@ namespace feather
         return status();
     };
 
-
+    RENDER_START(LUX_RENDER_ID)
+    {
+        std::cout << "RENDER START\n";
+        return status();
+    };
+ 
+    RENDER_STOP(LUX_RENDER_ID)
+    {
+        std::cout << "RENDER STOP\n";
+        return status();
+    };
+   
     RENDER_BUFFER(LUX_RENDER_ID)
     {
         std::cout << "LuxRender Render Buffer Called\n";
+
+
+        luxcore::Init();
+
+        std::cout << "LuxCore\n"; // << pyluxcore.Version();
+        std::cout << "RenderConfig and RenderSession examples (requires scenes directory)...\n";
+
+        // Load the configuration from file
+        luxcore::Scene scene("/home/richard/luxed_tests/basic_test/scene.scn");
+        luxrays::Properties props("/home/richard/luxed_tests/basic_test/render.cfg");
+
+
+        //props = pyluxcore.Properties("scenes/luxball/luxball-hdr.cfg")
+
+        // Change the render engine to PATHCPU
+        //props.Set(pyluxcore.Property("renderengine.type", ["PATHCPU"]))
+
+        //config = pyluxcore.RenderConfig(props)
+        luxcore::RenderConfig config(props,&scene);
+        //session = pyluxcore.RenderSession(config)
+        luxcore::RenderSession session(&config);
+        session.Start();
+
+        bool running=true;
+        int count=0;
+
+        while(running) {
+            /*
+            float* test;
+            float data[(400*200)*3];
+            char cdata[(400*200)*3];
+            test = data;
+            buffer.data=cdata;
+            */
+
+            if(session.GetFilm().HasOutput(luxcore::Film::OUTPUT_RGB_TONEMAPPED)) {
+                std::cout << "FILM OUTPUT FOUND\n";
+                /*
+                session.GetFilm().GetOutput<float>(luxcore::Film::OUTPUT_RGB_TONEMAPPED,test);
+                // film up buffer
+                int i=0;
+                while(i < ((400*200)*3)) {
+                    buffer.data[i++] = test[i] * 255;
+                    buffer.data[i++] = test[i] * 255;
+                    buffer.data[i++] = test[i] * 255;
+                    //std::cout << "[" << test[i++] << "," << test[i++] << "," << test[i++] << "],";
+                }
+                std::cout << "\n\n\n";
+                */
+
+                //session.GetFilm().GetOutput<float>(luxcore::Film::OUTPUT_RGB_TONEMAPPED,reinterpret_cast<float*>(&buffer.data));
+                //std::cout << "buffer length " << sizeof(&test) << std::endl;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds(1));
+
+            count++;
+            if(count==20)
+                running=false;
+        }
+        /*
+        startTime = time.time()
+        while True:
+	    time.sleep(1)
+
+	    elapsedTime = time.time() - startTime
+
+	    # Print some information about the rendering progress
+
+	    # Update statistics
+	    session.UpdateStats()
+
+	    stats = session.GetStats();
+	    print("[Elapsed time: %3d/5sec][Samples %4d][Avg. samples/sec % 3.2fM on %.1fK tris]" % (
+		    stats.Get("stats.renderengine.time").GetFloat(),
+	            stats.Get("stats.renderengine.pass").GetInt(),
+		    (stats.Get("stats.renderengine.total.samplesec").GetFloat()  / 1000000.0),
+		    (stats.Get("stats.dataset.trianglecount").GetFloat() / 1000.0)))
+
+	    if elapsedTime > 5.0:
+		# Time to stop the rendering
+		break
+        */
+
+
+        // the render won't show if the session is still running
+        session.Stop();
+
+        float* test;
+        float data[(400*200)*3];
+        test = data;
+        char cdata[(400*200)*3];
+        buffer.data = cdata;
+
+        session.GetFilm().GetOutput<float>(luxcore::Film::OUTPUT_RGB_TONEMAPPED,test);
+        // film up buffer
+        uint32_t buffer_size=400*200*3;
+        uint32_t i=0;
+        uint32_t offset=199;
+        uint32_t linestep=0;
+        while(i < buffer_size) {
+            // buffer.data[0] = RED
+            // buffer.data[1] = GREEN
+            // buffer.data[2] = BLUE
+            while(linestep < (400*3)) {
+                buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
+                buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
+                buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
+                //linestep++;
+            }
+            offset--;
+            linestep=0;
+            //std::cout << "[" << test[i++] << "," << test[i++] << "," << test[i++] << "],";
+        }
+        std::cout << "\n\n\n";
+
+        // Save the rendered image
+        //session.GetFilm().Save()
+        //session.GetFilm().SaveOutput("/home/richard/lux_test.png",luxcore::Film::OUTPUT_RGB_TONEMAPPED,props);
+
+        std::cout << "Done.\n";
+
         return status();
     };
 

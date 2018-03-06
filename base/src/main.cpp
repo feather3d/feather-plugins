@@ -29,6 +29,8 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
+#include <feather/render.hpp>
+
 
 /*
  ***************************************

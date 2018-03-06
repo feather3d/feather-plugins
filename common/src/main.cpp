@@ -25,6 +25,7 @@
 #include <feather/pluginmanager.hpp>
 #include <feather/field.hpp>
 #include <feather/node.hpp>
+#include <feather/render.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
 #include <feather/draw.hpp>

@@ -27,6 +27,7 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
+#include <feather/render.hpp>
 //#include <feather/scenegraph.hpp>
 #include <feather/draw.hpp>
 #include <feather/tools.hpp>
