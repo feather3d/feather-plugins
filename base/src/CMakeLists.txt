@@ -14,4 +14,4 @@ SET_TARGET_PROPERTIES(feather_plugin
     SOVERSION 1)
 
 INSTALL(TARGETS feather_plugin
-    LIBRARY DESTINATION /usr/share/feather/plugins)
+    LIBRARY DESTINATION /usr/lib/feather/plugins)

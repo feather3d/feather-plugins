@@ -29,4 +29,4 @@ SET_TARGET_PROPERTIES(feather_io
     SOVERSION 1)
 
 INSTALL(TARGETS feather_io
-    LIBRARY DESTINATION /usr/share/feather/plugins)
+    LIBRARY DESTINATION /usr/lib/feather/plugins)

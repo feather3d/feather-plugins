@@ -62,4 +62,4 @@ SET_TARGET_PROPERTIES(feather_lux
     SOVERSION 1)
 
 INSTALL(TARGETS feather_lux
-    LIBRARY DESTINATION /usr/share/feather/plugins)
+    LIBRARY DESTINATION /usr/lib/feather/plugins)

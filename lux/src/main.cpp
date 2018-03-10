@@ -30,6 +30,7 @@
 #include <feather/node.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
+#include <feather/scenegraph.hpp>
 #include <luxcore/luxcore.h>
 #include <luxrays/utils/properties.h>
 #include <slg/slg.h>
@@ -124,6 +125,10 @@ namespace feather
         sluxprops.session = new luxcore::RenderSession(sluxprops.config);
  
         sluxprops.session->Start();
+
+        std::vector<uint32_t> uids;
+        scenegraph::get_nodes(uids);
+        std::cout << "NUMBER OF NODES:" << uids.size() << std::endl;
 
         return status();
     };

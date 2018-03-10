@@ -28,4 +28,4 @@ SET_TARGET_PROPERTIES(feather_polygon
     SOVERSION 1)
 
 INSTALL(TARGETS feather_polygon
-    LIBRARY DESTINATION /usr/share/feather/plugins)
+    LIBRARY DESTINATION /usr/lib/feather/plugins)

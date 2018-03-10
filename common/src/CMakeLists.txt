@@ -22,4 +22,4 @@ SET_TARGET_PROPERTIES(feather_common
     SOVERSION 1)
 
 INSTALL(TARGETS feather_common
-    LIBRARY DESTINATION /usr/share/feather/plugins)
+    LIBRARY DESTINATION /usr/lib/feather/plugins)
