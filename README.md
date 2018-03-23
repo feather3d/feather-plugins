@@ -16,5 +16,16 @@ Below is a list of current plugins and what they do
 * base - blank plugin intended to be used as a starting point for creating new plugins
 * common - collection of basic nodes and commands
 * polygon - works on polygon mesh data
-* obj - importing and exporting of the obj 3d format
- 
+* io - handling various input and output operations such as file formats
+* deformer - nodes and commands for the location of polygon data
+* lux - integrates lux render into application
+
+Plugin ID List
+---------------
+1 - common
+2 - io
+3 - polygon
+4 - animation
+5 - deformer
+6 - lux
+

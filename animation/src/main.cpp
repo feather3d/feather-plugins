@@ -45,12 +45,14 @@ extern "C" {
 
 using namespace feather;
 
+#define ANIMATION_PLUGIN_ID 4
+
 #define ANIMATION_KEYTRACK 420
 #define ANIMATION_BONE 421
 #define ANIMATION_MORPH 426
 
 
-PLUGIN_INIT("Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEYTRACK,ANIMATION_MORPH)
+PLUGIN_INIT(ANIMATION_PLUGIN_ID,"Animation","Animation nodes and commands","Richard Layman",ANIMATION_KEYTRACK,ANIMATION_MORPH)
 
 
 /*

@@ -45,6 +45,8 @@ extern "C" {
 
 using namespace feather;
 
+#define POLYGON_PLUGIN_ID 3
+
 #define POLYGON_SHAPE 320
 #define POLYGON_PLANE 321
 #define POLYGON_CUBE 322
@@ -52,7 +54,7 @@ using namespace feather;
 #define POLYGON_MESH 324
 
 
-PLUGIN_INIT("Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_MESH)
+PLUGIN_INIT(POLYGON_PLUGIN_ID,"Polygon","Polygon objects and tools","Richard Layman",POLYGON_SHAPE,POLYGON_MESH)
 
 /*
  ***************************************

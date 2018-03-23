@@ -46,7 +46,9 @@ extern "C" {
 
 using namespace feather;
 
-PLUGIN_INIT("IO","Import and export different 3d file formats","Richard Layman",0,0)
+#define IO_PLUGIN_ID 2
+
+PLUGIN_INIT(IO_PLUGIN_ID,"IO","Import and export different 3d file formats","Richard Layman",0,0)
 
 
 /*

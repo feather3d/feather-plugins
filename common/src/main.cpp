@@ -26,6 +26,7 @@
 #include <feather/field.hpp>
 #include <feather/node.hpp>
 #include <feather/render.hpp>
+#include <feather/attribute.hpp>
 #include <feather/parameter.hpp>
 #include <feather/command.hpp>
 #include <feather/draw.hpp>
@@ -57,6 +58,8 @@ extern "C" {
 
 using namespace feather;
 
+#define COMMON_PLUGIN_ID 1
+
 // Define all of our nodes
 // with id's here.
 #define EMPTY 1
@@ -66,7 +69,7 @@ using namespace feather;
 #define MULTIPLY 5
 #define DIVIDE 6
 
-PLUGIN_INIT("Common","Commonly used nodes and commands","Richard Layman",EMPTY,DIVIDE)
+PLUGIN_INIT(COMMON_PLUGIN_ID,"Common","Commonly used nodes and commands","Richard Layman",EMPTY,DIVIDE)
 
 /*
  ***************************************

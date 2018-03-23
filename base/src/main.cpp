@@ -57,6 +57,13 @@ extern "C" {
 
 using namespace feather;
 
+// Every plugin needs to be assigned to a unique id number.
+// Be sure to pick an id number that has not already been used.
+// You can find a list of used id numbers in the application and on the plugin github page.
+// Currently, the max plugin id is set to 20 but will probably be increased later
+#define BASE_PLUGIN_ID 0
+
+
 // Define all of our nodes
 // with id's here.
 #define STARTNODE 5
@@ -72,7 +79,50 @@ using namespace feather;
  * This macro handles some misc bindings
  * between the plugin and the pluginmanager.
  */ 
-PLUGIN_INIT("name","description","author",STARTNODE,ENDNODE)
+PLUGIN_INIT(BASE_PLUGIN_ID,"name","description","author",STARTNODE,ENDNODE)
+
+
+/*
+ ***************************************
+ *              ATTRIBUTES             *
+ ***************************************
+* Attributes are used for holding static data
+* values. These values can be of the following
+* data types.
+*       bool
+*       unsigned int
+*       int
+*       real
+*       string
+* Attributes can be accessed from within
+* the plugin or the interface as well using
+* the plugin id and the attribute id.
+* /
+
+// First Define the Attribute id's for the values
+#define BASE_TEST_BOOL_ATTRIBUTE 1
+#define BASE_TEST_UINT_ATTRIBUTE 2
+#define BASE_TEST_INT_ATTRIBUTE 3
+#define BASE_TEST_REAL_ATTRIBUTE 4
+#define BASE_TEST_STRING_ATTRIBUTE 5
+
+/*
+ ***************************************
+ *          ADD_ATTRIBUTE              *
+ ***************************************
+* ADD_[TYPE]_ATTRIBUTE(plugin_id,attribute_id,name,default)
+* [TYPE] = type of attribute [BOOL,UINT,INT,REAL,STRING]
+* plugin_id = the unique id of the plugin
+* attribute_id = the unique id of the attribute
+* name = name of the attribute, this can be called inside of the plugin
+* default = initial value of the attribute
+* /
+ADD_BOOL_ATTRIBUTE(BASE_PLUGIN_ID,BASE_TEST_BOOL_ATTRIBUTE,test_bool_attribute,true)
+ADD_UINT_ATTRIBUTE(BASE_PLUGIN_ID,BASE_TEST_UINT_ATTRIBUTE,test_uint_attribute,2332)
+ADD_INT_ATTRIBUTE(BASE_PLUGIN_ID,BASE_TEST_INT_ATTRIBUTE,test_int_attribute,23)
+ADD_REAL_ATTRIBUTE(BASE_PLUGIN_ID,BASE_TEST_REAL_ATTRIBUTE,test_real_attribute,23.23)
+ADD_STRING_ATTRIBUTE(BASE_PLUGIN_ID,BASE_TEST_STRING_ATTRIBUTE,test_string_attribute,"test")
+
 
 /*
  ***************************************

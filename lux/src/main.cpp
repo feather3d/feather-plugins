@@ -71,6 +71,14 @@ using namespace feather;
 // 551-560 - lights
 // 561-570 - camera 
 
+#define LUX_PLUGIN_ID 6 
+
+#define LUX_TEST_BOOL_ATTRIBUTE 1
+#define LUX_TEST_UINT_ATTRIBUTE 2
+#define LUX_TEST_INT_ATTRIBUTE 3
+#define LUX_TEST_REAL_ATTRIBUTE 4
+#define LUX_TEST_STRING_ATTRIBUTE 5
+
 #define LUX_RENDER_ID 1
 
 #define LUX_SHADER_MATTE 511
@@ -84,7 +92,20 @@ using namespace feather;
  ***************************************
  */ 
 
-PLUGIN_INIT("LuxRender","LuxRender nodes and commands","Richard Layman",LUX_SHADER_MATTE,LUX_CAMERA_PERSPECTIVE)
+PLUGIN_INIT(LUX_PLUGIN_ID,"LuxRender","LuxRender nodes and commands","Richard Layman",LUX_SHADER_MATTE,LUX_CAMERA_PERSPECTIVE)
+
+
+/*
+ ***************************************
+ *            ATTRIBUTES               *
+ ***************************************
+ */ 
+
+ADD_BOOL_ATTRIBUTE(LUX_TEST_BOOL_ATTRIBUTE,test_bool_attribute,true)
+ADD_UINT_ATTRIBUTE(LUX_TEST_UINT_ATTRIBUTE,test_uint_attribute,2332)
+ADD_INT_ATTRIBUTE(LUX_TEST_INT_ATTRIBUTE,test_int_attribute,23)
+ADD_REAL_ATTRIBUTE(LUX_TEST_REAL_ATTRIBUTE,test_real_attribute,23.23)
+ADD_STRING_ATTRIBUTE(LUX_TEST_STRING_ATTRIBUTE,test_string_attribute,"test")
 
 /*
  ***************************************
@@ -177,6 +198,12 @@ namespace feather
                 //std::cout << "[" << test[i++] << "," << test[i++] << "," << test[i++] << "],";
             }
         }
+
+        std::cout << "\nTEST BOOL ATTRIBUTE VALUE:" << test_bool_attribute << std::endl;
+        std::cout << "\nTEST UINT ATTRIBUTE VALUE:" << test_uint_attribute << std::endl;
+        std::cout << "\nTEST INT ATTRIBUTE VALUE:" << test_int_attribute << std::endl;
+        std::cout << "\nTEST REAL ATTRIBUTE VALUE:" << test_real_attribute << std::endl;
+        //std::cout << "\nTEST STRING ATTRIBUTE VALUE:" << test_bool_attribute << std::endl;
 
         return status();
     };

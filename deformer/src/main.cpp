@@ -44,9 +44,11 @@ extern "C" {
 
 using namespace feather;
 
+#define DEFORMER_PLUGIN_ID 5
+
 #define CLUSTER 440
 
-PLUGIN_INIT("Deformer","Deformer nodes and commands","Richard Layman",CLUSTER,CLUSTER)
+PLUGIN_INIT(DEFORMER_PLUGIN_ID,"Deformer","Deformer nodes and commands","Richard Layman",CLUSTER,CLUSTER)
 
 
 /*
