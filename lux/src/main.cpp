@@ -78,6 +78,9 @@ using namespace feather;
 #define LUX_TEST_INT_ATTRIBUTE 3
 #define LUX_TEST_REAL_ATTRIBUTE 4
 #define LUX_TEST_STRING_ATTRIBUTE 5
+// TEST ATTRIBUTES
+#define LUX_FRAME_WIDTH 6
+#define LUX_FRAME_HEIGHT 7
 
 #define LUX_RENDER_ID 1
 
@@ -106,6 +109,9 @@ ADD_UINT_ATTRIBUTE(LUX_TEST_UINT_ATTRIBUTE,test_uint_attribute,2332)
 ADD_INT_ATTRIBUTE(LUX_TEST_INT_ATTRIBUTE,test_int_attribute,23)
 ADD_REAL_ATTRIBUTE(LUX_TEST_REAL_ATTRIBUTE,test_real_attribute,23.23)
 ADD_STRING_ATTRIBUTE(LUX_TEST_STRING_ATTRIBUTE,test_string_attribute,"test")
+ADD_UINT_ATTRIBUTE(LUX_FRAME_WIDTH,frame_width,400)
+ADD_UINT_ATTRIBUTE(LUX_FRAME_HEIGHT,frame_height,200)
+
 
 /*
  ***************************************
@@ -137,19 +143,76 @@ namespace feather
     {
         std::cout << "RENDER START\n";
 
+        // clear out the old pointers
+        if(sluxprops.scene != nullptr) {
+            delete sluxprops.scene;
+            sluxprops.scene = nullptr;
+        }
+
+        if(sluxprops.properties != nullptr) {
+            delete sluxprops.properties;
+            sluxprops.properties = nullptr;
+        }
+
+        if(sluxprops.config != nullptr) {
+            delete sluxprops.config;
+            sluxprops.config = nullptr;
+        }
+
+        if(sluxprops.session != nullptr) {
+            delete sluxprops.session;
+            sluxprops.session = nullptr;
+        }
+
         luxcore::Init();
 
+        // LOAD THE SCENE
+        //sluxprops.scene = new luxcore::Scene();
+
+        std::vector<uint32_t> cameras;
+        std::vector<uint32_t> shapes;
+
+        scenegraph::get_node_by_type(node::Camera,cameras);
+        scenegraph::get_node_by_type(node::Shape,shapes);
+        std::cout << "NUMBER OF CAMERAS:" << cameras.size() << std::endl;
+        std::cout << "NUMBER OF SHAPES:" << shapes.size() << std::endl;
+
+        
+        // TODO - CLEANUP OLD POINTERS HERE
+
         sluxprops.scene = new luxcore::Scene("/home/richard/luxed_tests/test_set/set.scn");
-        sluxprops.properties = new luxrays::Properties("/home/richard/luxed_tests/test_set/render.cfg");
+        //sluxprops.properties = new luxrays::Properties("/home/richard/luxed_tests/test_set/render.cfg");
+
+        sluxprops.properties = new luxrays::Properties();
+
+        sluxprops.properties->Set(luxrays::Property("renderengine.type",std::string("PATHOCL")));
+        sluxprops.properties->Set(luxrays::Property("opencl.platform.index",-1));
+        sluxprops.properties->Set(luxrays::Property("opencl.cpu.use",0));
+        sluxprops.properties->Set(luxrays::Property("opencl.gpu.use",1));
+        sluxprops.properties->Set(luxrays::Property("opencl.gpu.workgroup.size",64));
+        sluxprops.properties->Set(luxrays::Property("scene.epsilon.min",9.999));
+        sluxprops.properties->Set(luxrays::Property("scene.epsilon.max",0.1));
+        sluxprops.properties->Set(luxrays::Property("accelerator.instances.enable",0));
+        sluxprops.properties->Set(luxrays::Property("path.maxdepth",12));
+        sluxprops.properties->Set(luxrays::Property("film.width",frame_width));
+        sluxprops.properties->Set(luxrays::Property("film.height",frame_height));
+        sluxprops.properties->Set(luxrays::Property("sampler.type",std::string("RANDOM")));
+        sluxprops.properties->Set(luxrays::Property("film.filter.type",std::string("GAUSSIAN")));
+        sluxprops.properties->Set(luxrays::Property("film.filter.xwidth",1));
+        sluxprops.properties->Set(luxrays::Property("film.filter.ywidth",1));
+
+        //sluxprops.properties->Set(luxrays::Property("film.imagepipeline.0.type","TONEMAP_LINEAR"));
+        //sluxprops.properties->Set(luxrays::Property("film.imagepipeline.1.type","GAMMA_CORRECTION"));
+        //sluxprops.properties->Set(luxrays::Property("film.imagepipeline.1.value",2.2));
 
         sluxprops.config = new luxcore::RenderConfig(*sluxprops.properties,sluxprops.scene);
         sluxprops.session = new luxcore::RenderSession(sluxprops.config);
+
+        //sluxprops.config->GetProperties().Set(luxrays::Property("frame.width")(frame_width));
+        //sluxprops.config->GetProperties().Set(luxrays::Property("frame.height",luxrays::PropertyValue(frame_height)));
+        //sluxprops.config->GetProperties().Get("frame.height")=34;
  
         sluxprops.session->Start();
-
-        std::vector<uint32_t> uids;
-        scenegraph::get_nodes(uids);
-        std::cout << "NUMBER OF NODES:" << uids.size() << std::endl;
 
         return status();
     };
@@ -168,29 +231,32 @@ namespace feather
     {
         sluxprops.session->UpdateStats();
 
-        float* test;
-        float data[(400*200)*3];
-        test = data;
-        char cdata[(400*200)*3];
-        buffer.data = cdata;
+        std::cout << "frame_width=" << frame_width << " frame_height=" << frame_height << std::endl;
+        std::cout << "buffer width=" << buffer.width << " buffer height=" << buffer.height << std::endl;
+        std::cout << "value=" << (frame_width*frame_height)*3 << std::endl;
+
+        float* data = new float[(frame_width*frame_height)*3];
+        delete [] buffer.data;
+        buffer.data = new char[(frame_width*frame_height)*3];
 
         std::cout << "sample count:" << sluxprops.session->GetFilm().GetTotalSampleCount();
 
         if(sluxprops.session->GetFilm().HasOutput(luxcore::Film::OUTPUT_RGB_TONEMAPPED)) {
-            sluxprops.session->GetFilm().GetOutput<float>(luxcore::Film::OUTPUT_RGB_TONEMAPPED,test);
+            sluxprops.session->GetFilm().GetOutput<float>(luxcore::Film::OUTPUT_RGB_TONEMAPPED,data);
             // film up buffer
-            uint32_t buffer_size=400*200*3;
+            uint32_t buffer_size=frame_width*frame_height*3;
             uint32_t i=0;
-            uint32_t offset=199;
+            //uint32_t offset=199;
+            uint32_t offset=frame_height-1;
             uint32_t linestep=0;
             while(i < buffer_size) {
                 // buffer.data[0] = RED
                 // buffer.data[1] = GREEN
                 // buffer.data[2] = BLUE
-                while(linestep < (400*3)) {
-                    buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
-                    buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
-                    buffer.data[(linestep++)+(400*offset*3)] = test[i++] * 255;
+                while(linestep < (frame_width*3)) {
+                    buffer.data[(linestep++)+(frame_width*offset*3)] = data[i++] * 255;
+                    buffer.data[(linestep++)+(frame_width*offset*3)] = data[i++] * 255;
+                    buffer.data[(linestep++)+(frame_width*offset*3)] = data[i++] * 255;
                     //linestep++;
                 }
                 offset--;
@@ -204,6 +270,8 @@ namespace feather
         std::cout << "\nTEST INT ATTRIBUTE VALUE:" << test_int_attribute << std::endl;
         std::cout << "\nTEST REAL ATTRIBUTE VALUE:" << test_real_attribute << std::endl;
         //std::cout << "\nTEST STRING ATTRIBUTE VALUE:" << test_bool_attribute << std::endl;
+
+        delete[] data;
 
         return status();
     };
