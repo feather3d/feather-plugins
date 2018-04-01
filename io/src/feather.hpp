@@ -62,7 +62,7 @@ namespace io
         struct data_t {
             unsigned int fid;
             unsigned short type;
-            unsigned short length;
+            uint32_t length;
         };
 
         bool open(std::string filename);

@@ -145,7 +145,42 @@ bool io::feather_format::open(std::string filename) {
                     static_cast<field::Field<FVector3D>*>(srcfield)->value = vectorval;
                     break;
                 case field::Mesh:
-                    file.read((char*)&meshval,sizeof(FMesh));
+                    uint32_t length;
+                    // v
+                    file.read((char*)&length,sizeof(uint32_t));
+                    for(uint32_t i=0; i < length; i++){
+                        FVertex3D v;
+                        file.read((char*)&v,sizeof(FVertex3D));
+                        meshval.v.push_back(v);
+                    }
+                    // st
+                    file.read((char*)&length,sizeof(uint32_t));
+                    for(uint32_t i=0; i < length; i++){
+                        FTextureCoord st;
+                        file.read((char*)&st,sizeof(FTextureCoord));
+                        meshval.st.push_back(st);
+                    }
+                    // vn
+                    file.read((char*)&length,sizeof(uint32_t));
+                    for(uint32_t i=0; i < length; i++){
+                        FVertex3D vn;
+                        file.read((char*)&vn,sizeof(FVertex3D));
+                        meshval.vn.push_back(vn);
+                    }
+                    // f
+                    uint32_t fcount;
+                    uint32_t fpcount;
+                    file.read((char*)&fcount,sizeof(uint32_t));
+                    for(uint32_t i=0; i < fcount; i++){
+                        file.read((char*)&fpcount,sizeof(uint32_t));
+                        FFacePoint fp;
+                        FFace face;
+                        for(uint32_t j=0; j < fpcount; j++){
+                            file.read((char*)&fp,sizeof(FFacePoint));
+                            face.push_back(fp);
+                        }
+                        meshval.f.push_back(face);
+                    }
                     static_cast<field::Field<FMesh>*>(srcfield)->value = meshval;
                     break;
                 case field::RGB:
@@ -292,7 +327,8 @@ bool io::feather_format::save(std::string filename) {
                         fieldinfo.length = sizeof(FVector3D);
                         break;
                     case field::Mesh:
-                        fieldinfo.length = sizeof(FMesh);
+                        //fieldinfo.length = static_cast<field::Field<FMesh>*>(srcfield)->value.v.size();
+                        //std::cout << "MESH SIZE:" << fieldinfo.length << std::endl;
                         break;
                     case field::RGB:
                         fieldinfo.length = sizeof(FColorRGB);
@@ -393,6 +429,7 @@ bool io::feather_format::save(std::string filename) {
             FKey keyval;
             FCurvePoint2D curvepoint2dval;
             FCurvePoint3D curvepoint3dval;
+            uint32_t length;
 
             switch(srcfield->type){
                 case field::Bool:
@@ -425,7 +462,28 @@ bool io::feather_format::save(std::string filename) {
                     break;
                 case field::Mesh:
                     meshval = static_cast<field::Field<FMesh>*>(srcfield)->value;
-                    file.write((char*)&meshval,fieldinfo.length);
+                    // v
+                    length = meshval.v.size();
+                    file.write((char*)&length,sizeof(uint32_t));
+                    file.write((char*)&meshval.v[0],length*sizeof(FVertex3D));
+                    // st
+                    length = meshval.st.size();
+                    file.write((char*)&length,sizeof(uint32_t));
+                    file.write((char*)&static_cast<field::Field<FMesh>*>(srcfield)->value.st[0],length*sizeof(FTextureCoord));
+                    // vn
+                    length = meshval.vn.size();
+                    file.write((char*)&length,sizeof(uint32_t));
+                    file.write((char*)&static_cast<field::Field<FMesh>*>(srcfield)->value.vn[0],length*sizeof(FVertex3D));
+                    // f
+                    length = meshval.f.size();
+                    file.write((char*)&length,sizeof(uint32_t));
+                    for(uint32_t i=0; i < meshval.f.size(); i++){
+                        length = meshval.f[i].size();
+                        file.write((char*)&length,sizeof(uint32_t));
+                        for(uint32_t j=0; j < 4; j++){
+                            file.write((char*)&static_cast<field::Field<FMesh>*>(srcfield)->value.f[i][j],sizeof(FFacePoint));
+                        }
+                    } 
                     break;
                 case field::RGB:
                     rgbval = static_cast<field::Field<FColorRGB>*>(srcfield)->value;
