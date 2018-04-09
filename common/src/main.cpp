@@ -68,8 +68,9 @@ using namespace feather;
 #define TIME 4
 #define MULTIPLY 5
 #define DIVIDE 6
+#define RENDEROBJECT 7
 
-PLUGIN_INIT(COMMON_PLUGIN_ID,"Common","Commonly used nodes and commands","Richard Layman",EMPTY,DIVIDE)
+PLUGIN_INIT(COMMON_PLUGIN_ID,"Common","Commonly used nodes and commands","Richard Layman",EMPTY,RENDEROBJECT)
 
 /*
  ***************************************
@@ -383,6 +384,30 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(DIVIDE,node::Tool,"divide.svg")
+
+
+/*
+ ***************************************
+ *           RENDEROBJECT              *
+ ***************************************
+*/
+
+ADD_FIELD_TO_NODE(RENDEROBJECT,FMesh,field::Mesh,field::connection::In,FMesh(),1)
+
+
+namespace feather
+{
+    DO_IT(RENDEROBJECT)
+    { 
+        //ShapeFields* shape = static_cast<ShapeFields*>(fields);
+        //std::cout << "shape: meshIn:" << shape->meshIn << std::endl;
+
+        return status();
+    };
+} // namespace feather
+
+NODE_INIT(RENDEROBJECT,node::Shape,"renderobject.svg")
+
 
 
 /*

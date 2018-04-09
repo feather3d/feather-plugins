@@ -115,6 +115,8 @@ bool io::feather_format::open(std::string filename) {
             FCurvePoint2D curvepoint2dval;
             FCurvePoint3D curvepoint3dval;
 
+            uint32_t length;
+
             switch(srcfield->type){
                 case field::Bool:
                     file.read((char*)&bval,sizeof(bool));
@@ -145,7 +147,6 @@ bool io::feather_format::open(std::string filename) {
                     static_cast<field::Field<FVector3D>*>(srcfield)->value = vectorval;
                     break;
                 case field::Mesh:
-                    uint32_t length;
                     // v
                     file.read((char*)&length,sizeof(uint32_t));
                     for(uint32_t i=0; i < length; i++){
@@ -480,10 +481,11 @@ bool io::feather_format::save(std::string filename) {
                     for(uint32_t i=0; i < meshval.f.size(); i++){
                         length = meshval.f[i].size();
                         file.write((char*)&length,sizeof(uint32_t));
-                        for(uint32_t j=0; j < 4; j++){
+                        // write each face point
+                        for(uint32_t j=0; j < length; j++){
                             file.write((char*)&static_cast<field::Field<FMesh>*>(srcfield)->value.f[i][j],sizeof(FFacePoint));
                         }
-                    } 
+                    }
                     break;
                 case field::RGB:
                     rgbval = static_cast<field::Field<FColorRGB>*>(srcfield)->value;

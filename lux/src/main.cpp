@@ -37,7 +37,6 @@
 #include <slg/slg.h>
 #include <chrono>
 #include <thread>
-#include "lux.hpp"
 
 
 /*
