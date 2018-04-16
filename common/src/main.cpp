@@ -146,8 +146,8 @@ NODE_INIT(CAMERA,node::Camera,"node_camera.svg")
 */
 
 ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),1)
-ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),2)
-
+ADD_FIELD_TO_NODE(SHAPE,FNode,field::Node,field::connection::In,FNode(),2)
+ADD_FIELD_TO_NODE(SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),3)
 
 namespace feather
 {
@@ -393,6 +393,7 @@ NODE_INIT(DIVIDE,node::Tool,"divide.svg")
 */
 
 ADD_FIELD_TO_NODE(RENDEROBJECT,FMesh,field::Mesh,field::connection::In,FMesh(),1)
+ADD_FIELD_TO_NODE(RENDEROBJECT,FNode,field::Node,field::connection::In,FNode(),2)
 
 
 namespace feather
@@ -406,7 +407,7 @@ namespace feather
     };
 } // namespace feather
 
-NODE_INIT(RENDEROBJECT,node::Shape,"renderobject.svg")
+NODE_INIT(RENDEROBJECT,node::Object,"renderobject.svg")
 
 
 

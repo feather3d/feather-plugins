@@ -111,16 +111,6 @@ ADD_STRING_ATTRIBUTE(LUX_TEST_STRING_ATTRIBUTE,test_string_attribute,"test")
 ADD_UINT_ATTRIBUTE(LUX_FRAME_WIDTH,frame_width,400)
 ADD_UINT_ATTRIBUTE(LUX_FRAME_HEIGHT,frame_height,200)
 
-
-/*
- ***************************************
- *            MATTE SHADER             *
- ***************************************
- */
-
-// color
-ADD_FIELD_TO_NODE(LUX_SHADER_MATTE,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(),1)
-
 struct LuxRenderProperties {
     luxcore::Scene* scene;
     luxrays::Properties* properties;
@@ -133,11 +123,6 @@ static LuxRenderProperties sluxprops = LuxRenderProperties();
 
 namespace feather
 {
-
-    DO_IT(LUX_SHADER_MATTE)
-    {
-        return status();
-    };
 
     RENDER_START(LUX_RENDER_ID)
     {
@@ -203,7 +188,7 @@ namespace feather
         sluxprops.sceneprops = new luxrays::Properties();
  
         // CAMERA
-
+        /*
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.orig",luxrays::PropertyValues{0,1,6}));
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.target",luxrays::PropertyValues{0.0,1,0.0}));
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.up", luxrays::PropertyValues{0, 1, 0}));
@@ -212,6 +197,7 @@ namespace feather
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lensradius", 0.00));
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.focaldistance", 0.28));
         sluxprops.sceneprops->Set(luxrays::Property("scene.camera.fieldofview", 49));
+        */
 
         // VOLUME
 
@@ -261,7 +247,7 @@ namespace feather
         // DEFAULT MATERIAL 
 
         sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.type",std::string("roughmatte")));
-        sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.kd",luxrays::PropertyValues{0.5,0.5,0.5}));
+        sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.kd",luxrays::PropertyValues{0,1,0}));
         sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.sigma",luxrays::PropertyValues{0,0,0}));
         sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.bumptex",luxrays::PropertyValues{0,0,0}));
         sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.normaltex",luxrays::PropertyValues{0,0,0}));
@@ -289,13 +275,40 @@ namespace feather
         // LOAD SHAPE NODES
         std::vector<uint32_t> cameras;
         std::vector<uint32_t> shapes;
+        std::vector<uint32_t> lights;
 
         scenegraph::get_node_by_type(node::Camera,cameras);
         scenegraph::get_node_by_type(node::Shape,shapes);
         std::cout << "NUMBER OF CAMERAS:" << cameras.size() << std::endl;
         std::cout << "NUMBER OF SHAPES:" << shapes.size() << std::endl;
+        std::cout << "NUMBER OF LIGHTS:" << lights.size() << std::endl;
 
-        // load polygons
+
+        // load camera 
+        // for now we'll just use the first camera
+        if(cameras.size()) {
+            uint32_t uid = cameras[0];
+            // get camera properties
+            field::Field<FReal>* fov = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,2));
+            field::Field<FReal>* tx = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,203));
+            field::Field<FReal>* ty = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,204));
+            field::Field<FReal>* tz = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,205));
+
+
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.orig",luxrays::PropertyValues{tx->value,ty->value,tz->value}));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.target",luxrays::PropertyValues{0.0,1,0.0}));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.up", luxrays::PropertyValues{0, 1, 0}));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.cliphither", 0.001));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.clipyon", 100.00));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lensradius", 0.00));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.focaldistance", 0.28));
+            sluxprops.sceneprops->Set(luxrays::Property("scene.camera.fieldofview", 49));
+
+        } else {
+            std::cout << "NO CAMERA FOUND\n";
+        }
+ 
+        // load shapes 
         for(auto uid : shapes) {
             status error;
             std::string name;
@@ -470,6 +483,25 @@ namespace feather
 
 RENDER_INIT(LUX_RENDER_ID,"LuxRender")
 
+
+/*
+ ***************************************
+ *            MATTE SHADER             *
+ ***************************************
+ */
+
+// color
+ADD_FIELD_TO_NODE(LUX_SHADER_MATTE,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(),1)
+
+namespace feather
+{
+
+    DO_IT(LUX_SHADER_MATTE)
+    {
+        return status();
+    };
+
+} // namespace feather
 
 NODE_INIT(LUX_SHADER_MATTE,node::Shader,"")
 

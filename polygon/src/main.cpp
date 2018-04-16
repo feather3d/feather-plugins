@@ -65,8 +65,10 @@ PLUGIN_INIT(POLYGON_PLUGIN_ID,"Polygon","Polygon objects and tools","Richard Lay
 ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::In,FMesh(),1)
 // xformIn 
 ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMatrix4x4,field::Matrix4x4,field::connection::In,FMatrix4x4(),2)
+// shader 
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FNode,field::Node,field::connection::In,FNode(),3)
 // meshOut 
-ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),3)
+ADD_FIELD_TO_NODE(POLYGON_SHAPE,FMesh,field::Mesh,field::connection::Out,FMesh(),4)
 
 namespace feather
 {
@@ -75,11 +77,13 @@ namespace feather
     { 
         typedef field::Field<FMesh>*  MeshField;
         typedef field::Field<FMatrix4x4>*  MatrixField;
+        typedef field::Field<FNode>*  NodeField;
 
         MeshField meshIn=0;
         MeshField meshOut=0;
         MatrixField xformIn=0;
         MatrixField worldMatrixOut=0;
+        NodeField shaderIn=0;
 
         for(auto f : fields){
             if(f->id == 1)
@@ -87,6 +91,8 @@ namespace feather
             if(f->id == 2)
                 xformIn = static_cast<MatrixField>(f);
             if(f->id == 3)
+                shaderIn = static_cast<NodeField>(f);
+            if(f->id == 4)
                 meshOut = static_cast<MeshField>(f);
             if(f->id == 214)
                 worldMatrixOut = static_cast<MatrixField>(f);

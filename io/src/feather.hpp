@@ -31,37 +31,60 @@
 namespace io 
 {
 
+/*
+ * FEATHER FORMAT
+ *
+ * [header_t]
+ * [node_count]
+ * NODE DATA
+ *      [node_t]
+ *      [node_name]
+ * [link_count]
+ * LINK DATA
+ *      [link_t]
+ *      ...             // numbers of links based on node_t.link_count
+ * [field_count]
+ * FIELD DATA
+ *      [field_t]
+ *      [field data]    // length based on data_t.length
+ *      ...
+ *
+ *
+ * When opening Feather files all the nodes are created, links made and then values set.
+ */
     namespace feather_format
     {
 
         struct header_t {
-            unsigned short major; // version number
-            unsigned short minor; // version number
+            uint32_t major; // version number
+            uint32_t minor; // version number
             double stime;
             double etime;
             double ctime;
             double fps;
-            unsigned int nodecount; // how many nodes in the scenegraph
+            //uint32_t nodecount; // how many nodes in the scenegraph
         };
 
         struct node_t {
-            unsigned int uid;
-            unsigned int nid;
-            unsigned short namelength;
-            unsigned short linkcount;
-            unsigned short datacount;
+            uint32_t uid;
+            uint32_t nid;
+            uint32_t namelength;
+            //uint8_t linkcount;
+            //uint8_t datacount;
         };
 
         struct link_t {
-            unsigned int suid;
-            unsigned int sfid;
-            unsigned int tuid;
-            unsigned int tfid;
+            uint32_t suid;
+            uint32_t sfid;
+            uint32_t tuid;
+            uint32_t tfid;
         };
 
-        struct data_t {
-            unsigned int fid;
-            unsigned short type;
+        struct field_t {
+            uint32_t uid;
+            uint32_t nid;
+            uint32_t fid;
+            uint32_t type;
             uint32_t length;
         };
 
