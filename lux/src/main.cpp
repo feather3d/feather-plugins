@@ -121,6 +121,8 @@ struct LuxRenderProperties {
 
 static LuxRenderProperties sluxprops = LuxRenderProperties();
 
+static uint32_t loopcount = 0;
+
 namespace feather
 {
 
@@ -313,7 +315,7 @@ namespace feather
             status error;
             std::string name;
             scenegraph::get_node_name(uid,name,error);
-            // get the mesh in
+            // mesh in
             field::Field<FMesh>* meshfield = static_cast<field::Field<FMesh>*>(scenegraph::get_fieldBase(uid,1));
             // create lux mesh
             if(meshfield->value.is_tri_mesh())
@@ -362,16 +364,55 @@ namespace feather
 
             sluxprops.scene->DefineMesh(name.c_str(),mesh);
             std::stringstream ss;
+            // SHAPE
             ss << "scene.objects." << name.c_str() << ".shape";
             std::cout << ss.str() << std::endl;
             sluxprops.sceneprops->Set(luxrays::Property(ss.str().c_str(),std::string(name.c_str())));
-            ss.str(std::string());
-            ss << "scene.objects." << name.c_str() << ".material";
-            std::cout << ss.str() << std::endl;
-            if(name == "light_shape")
-                sluxprops.sceneprops->Set(luxrays::Property(ss.str().c_str(),std::string("default_light_mat")));
-            else 
-                sluxprops.sceneprops->Set(luxrays::Property(ss.str().c_str(),std::string("default_mat")));
+
+            // MATERIAL
+            // shader in
+            //field::Field<FNode>* nodefield = static_cast<field::Field<FNode>*>(scenegraph::get_fieldBase(uid,3));
+            std::vector<field::Connection> connections;
+            plugin::connections(uid,3,connections);
+
+            // SHADER INFO
+            if(connections.size()) {
+                std::cout << "SHADER CONNECTED TO SHAPE\n";
+                std::string shadername;
+                field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,1));
+                scenegraph::get_node_name(connections[0].puid,shadername,error);
+                // MATTE
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.type",std::string("roughmatte")));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.sigma",luxrays::PropertyValues{0,0,0}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumptex",luxrays::PropertyValues{0,0,0}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.normaltex",luxrays::PropertyValues{0,0,0}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.samples",-1));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.diffuse.enable",1));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.glossy.enable",1));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.specular.enable",1));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumpsamplingdistance",0.001));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.interior",std::string("default_volume")));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.exterior",std::string("default_volume")));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.id",1));
+                
+                //ss << "scene.objects." << name.c_str() << ".material";
+                sluxprops.sceneprops->Set(luxrays::Property("scene.objects."+name+".material",std::string(shadername+"_mat")));
+ 
+            } else {
+                //ss.str(std::string());
+                //ss << "scene.objects." << name.c_str() << ".material";
+                if(name == "light_shape")
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.objects."+name+".material",std::string("default_light_mat")));
+                else
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.objects."+name+".material",std::string("default_mat")));
+            }
+
+           //std::cout << ss.str() << std::endl;
+           // if(name == "light_shape")
+           //     sluxprops.sceneprops->Set(luxrays::Property(ss.str().c_str(),std::string("default_light_mat")));
+            //else 
+            //    sluxprops.sceneprops->Set(luxrays::Property(ss.str().c_str(),std::string("default_mat")));
        }
 
 
@@ -475,9 +516,38 @@ namespace feather
 
         delete[] data;
 
+        // THIS IS AN EXAMPLE HOW TO MODIFY A PROPERTY WITHOUT STOPING THE RENDERER
+        /*
+        sluxprops.session->BeginSceneEdit();
+        sluxprops.sceneprops->Set(luxrays::Property("scene.materials.default_mat.kd",luxrays::PropertyValues{1,0,0}));
+        sluxprops.scene->Parse(*sluxprops.sceneprops);
+        sluxprops.session->EndSceneEdit();
+        */
+           
+        loopcount++;
+
         return status();
     };
 
+    RENDER_MODIFY(LUX_RENDER_ID)
+    {
+        if(sluxprops.session) {
+            status error;
+            std::string name;
+            scenegraph::get_node_name(uid,name,error);
+
+            if(nid==LUX_SHADER_MATTE){
+                field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,1));
+                sluxprops.session->BeginSceneEdit();
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
+                sluxprops.scene->Parse(*sluxprops.sceneprops);
+                sluxprops.session->EndSceneEdit();
+            }
+        }
+
+        return status();
+    }
+ 
 } // namespace feather
 
 
@@ -491,7 +561,7 @@ RENDER_INIT(LUX_RENDER_ID,"LuxRender")
  */
 
 // color
-ADD_FIELD_TO_NODE(LUX_SHADER_MATTE,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(),1)
+ADD_FIELD_TO_NODE(LUX_SHADER_MATTE,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(0,1,0),1)
 
 namespace feather
 {
