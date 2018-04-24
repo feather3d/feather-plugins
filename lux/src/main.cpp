@@ -174,6 +174,10 @@ namespace feather
         sluxprops.properties->Set(luxrays::Property("scene.epsilon.max",0.1));
         sluxprops.properties->Set(luxrays::Property("accelerator.instances.enable",0));
         sluxprops.properties->Set(luxrays::Property("path.maxdepth",12));
+        // clamping
+        sluxprops.properties->Set(luxrays::Property("path.clamping.variance.maxvalue",100.0));
+
+        // film
         sluxprops.properties->Set(luxrays::Property("film.width",frame_width));
         sluxprops.properties->Set(luxrays::Property("film.height",frame_height));
         sluxprops.properties->Set(luxrays::Property("sampler.type",std::string("RANDOM")));
