@@ -539,12 +539,38 @@ namespace feather
             status error;
             std::string name;
             scenegraph::get_node_name(uid,name,error);
+            uint32_t node_type = scenegraph::get_node_type(uid);
 
+            if(node_type == node::Camera) {
+                // get camera properties
+                field::Field<FReal>* fov = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,2));
+                field::Field<FReal>* tx = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,203));
+                field::Field<FReal>* ty = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,204));
+                field::Field<FReal>* tz = static_cast<field::Field<FReal>*>(scenegraph::get_fieldBase(uid,205));
+
+                sluxprops.session->BeginSceneEdit();
+ 
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.orig",luxrays::PropertyValues{tx->value,ty->value,tz->value}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lookat.target",luxrays::PropertyValues{0.0,1,0.0}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.up", luxrays::PropertyValues{0, 1, 0}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.cliphither", 0.001));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.clipyon", 100.00));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.lensradius", 0.00));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.focaldistance", 0.28));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.camera.fieldofview", 49));
+                sluxprops.scene->Parse(*sluxprops.sceneprops);
+
+                sluxprops.session->EndSceneEdit();
+            }
+ 
             if(nid==LUX_SHADER_MATTE){
                 field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,1));
+
                 sluxprops.session->BeginSceneEdit();
+
                 sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
                 sluxprops.scene->Parse(*sluxprops.sceneprops);
+
                 sluxprops.session->EndSceneEdit();
             }
         }
