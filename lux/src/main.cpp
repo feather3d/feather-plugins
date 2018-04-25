@@ -84,7 +84,8 @@ using namespace feather;
 #define LUX_RENDER_ID 1
 
 #define LUX_SHADER_MATTE 511
-#define LUX_SHADER_EMISSION 512
+#define LUX_SHADER_GLOSSY 512
+#define LUX_SHADER_EMISSION 513
 #define LUX_CAMERA_PERSPECTIVE 561
 
 
@@ -383,23 +384,40 @@ namespace feather
             if(connections.size()) {
                 std::cout << "SHADER CONNECTED TO SHAPE\n";
                 std::string shadername;
-                field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,1));
                 scenegraph::get_node_name(connections[0].puid,shadername,error);
                 // MATTE
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.type",std::string("roughmatte")));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.sigma",luxrays::PropertyValues{0,0,0}));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumptex",luxrays::PropertyValues{0,0,0}));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.normaltex",luxrays::PropertyValues{0,0,0}));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.samples",-1));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.diffuse.enable",1));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.glossy.enable",1));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.specular.enable",1));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumpsamplingdistance",0.001));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.interior",std::string("default_volume")));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.exterior",std::string("default_volume")));
-                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.id",1));
-                
+                if(connections[0].pnid==LUX_SHADER_MATTE) {
+                    field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,1));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.type",std::string("roughmatte")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.sigma",luxrays::PropertyValues{0,0,0}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumptex",luxrays::PropertyValues{0,0,0}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.normaltex",luxrays::PropertyValues{0,0,0}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.samples",-1));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.diffuse.enable",1));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.glossy.enable",1));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.visibility.indirect.specular.enable",1));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.bumpsamplingdistance",0.001));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.interior",std::string("default_volume")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.exterior",std::string("default_volume")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.id",1));
+                }
+
+                if(connections[0].pnid==LUX_SHADER_GLOSSY) {
+                    field::Field<FColorRGBA>* kd = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,1));
+                    field::Field<FColorRGBA>* ks = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,2));
+                    field::Field<FColorRGBA>* uroughness = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,3));
+                    field::Field<FColorRGBA>* vroughness = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(connections[0].puid,4));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.type",std::string("glossy2")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.kd",luxrays::PropertyValues{kd->value.r,kd->value.g,kd->value.b}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.ks",luxrays::PropertyValues{ks->value.r,ks->value.g,ks->value.b}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.uroughness",luxrays::PropertyValues{uroughness->value.r,uroughness->value.g,uroughness->value.b}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.vroughness",luxrays::PropertyValues{vroughness->value.r,vroughness->value.g,vroughness->value.b}));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.interior",std::string("default_volume")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.volume.exterior",std::string("default_volume")));
+                    sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+shadername+"_mat.id",1));
+                }
+
                 //ss << "scene.objects." << name.c_str() << ".material";
                 sluxprops.sceneprops->Set(luxrays::Property("scene.objects."+name+".material",std::string(shadername+"_mat")));
  
@@ -562,17 +580,42 @@ namespace feather
 
                 sluxprops.session->EndSceneEdit();
             }
- 
+
+            // MATTE 
             if(nid==LUX_SHADER_MATTE){
                 field::Field<FColorRGBA>* color= static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,1));
 
                 sluxprops.session->BeginSceneEdit();
 
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.type",std::string("roughmatte")));
                 sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.kd",luxrays::PropertyValues{color->value.r,color->value.g,color->value.b}));
+
                 sluxprops.scene->Parse(*sluxprops.sceneprops);
 
                 sluxprops.session->EndSceneEdit();
             }
+
+            // GLOSSY
+            if(nid==LUX_SHADER_GLOSSY){
+                field::Field<FColorRGBA>* kd = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,1));
+                field::Field<FColorRGBA>* ks = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,2));
+                field::Field<FColorRGBA>* uroughness = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,3));
+                field::Field<FColorRGBA>* vroughness = static_cast<field::Field<FColorRGBA>*>(scenegraph::get_fieldBase(uid,4));
+
+                sluxprops.session->BeginSceneEdit();
+
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.type",std::string("glossy2")));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.kd",luxrays::PropertyValues{kd->value.r,kd->value.g,kd->value.b}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.ks",luxrays::PropertyValues{ks->value.r,ks->value.g,ks->value.b}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.uroughness",luxrays::PropertyValues{uroughness->value.r,uroughness->value.g,uroughness->value.b}));
+                sluxprops.sceneprops->Set(luxrays::Property("scene.materials."+name+"_mat.vroughness",luxrays::PropertyValues{vroughness->value.r,vroughness->value.g,vroughness->value.b}));
+
+                sluxprops.scene->Parse(*sluxprops.sceneprops);
+
+                sluxprops.session->EndSceneEdit();
+            }
+
+
         }
 
         return status();
@@ -604,6 +647,34 @@ namespace feather
 } // namespace feather
 
 NODE_INIT(LUX_SHADER_MATTE,node::Shader,"")
+
+
+/*
+ ***************************************
+ *           GLOSSY SHADER             *
+ ***************************************
+ */
+
+// kd
+ADD_FIELD_TO_NODE(LUX_SHADER_GLOSSY,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(0,0,0),1)
+// ks
+ADD_FIELD_TO_NODE(LUX_SHADER_GLOSSY,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(0,0,0),2)
+// uroughness
+ADD_FIELD_TO_NODE(LUX_SHADER_GLOSSY,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(0,0,0),3)
+// vroughness
+ADD_FIELD_TO_NODE(LUX_SHADER_GLOSSY,FColorRGBA,field::RGBA,field::connection::In,FColorRGBA(0,0,0),4)
+
+namespace feather
+{
+
+    DO_IT(LUX_SHADER_GLOSSY)
+    {
+        return status();
+    };
+
+} // namespace feather
+
+NODE_INIT(LUX_SHADER_GLOSSY,node::Shader,"")
 
 
 /*
